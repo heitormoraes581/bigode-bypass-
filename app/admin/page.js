@@ -10,7 +10,7 @@ const emptySettings={
  heroText:'Uma loja moderna, rápida e organizada, com atendimento eficiente e uma experiência de compra feita para PC.',
  heroButton:'Ver produtos',popularTitle:'Categorias populares',
  footerText:'Produtos digitais com uma experiência rápida e suporte eficiente.',
- copyright:'Copyright © 2026 - Bigode Bypass.',termsLabel:'Termos e condições',termsUrl:'#',
+ copyright:'Copyright © 2026 - Bigode Bypass.',termsLabel:'Termos e condições',termsUrl:'/termos',
  privacyLabel:'Privacidade',privacyUrl:'/privacidade',refundLabel:'Reembolso',refundUrl:'/reembolso',supportPageLabel:'Suporte',supportPageUrl:'/suporte',discordUrl:'#',youtubeUrl:'#',tiktokUrl:'#',
  primaryColor:'#2116ff',backgroundColor:'#07080b',panelColor:'#0d0e12',
  seoTitle:'Bigode Bypass',seoDescription:'Loja digital Bigode Bypass',
