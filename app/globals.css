@@ -1539,3 +1539,64 @@ footer{
   font-size:16px;
   letter-spacing:0;
 }
+
+/* ===== Discord authentication ===== */
+.discordLogin{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin:4px 0 16px;
+  padding:13px 16px;
+  border:0;
+  border-radius:8px;
+  background:#5865F2;
+  color:white;
+  font-weight:800;
+}
+.discordLogin:hover{background:#6571f5}
+.discordLogin:disabled{opacity:.6;cursor:not-allowed}
+.discordIcon{
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#ffffff18;
+}
+.authDivider{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:#666;
+  font-size:11px;
+  margin:5px 0 2px;
+}
+.authDivider::before,.authDivider::after{
+  content:'';
+  height:1px;
+  background:#272932;
+  flex:1;
+}
+.accountAvatar{
+  width:64px;
+  height:64px;
+  object-fit:cover;
+  border-radius:50%;
+  border:2px solid #5865F2;
+  margin:0 0 8px;
+}
+.callbackCard{text-align:center}
+.callbackBack{
+  display:inline-block;
+  margin-top:14px;
+  color:#898cff;
+  font-size:12px;
+}
+.profileAvatar{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  object-fit:cover;
+}
