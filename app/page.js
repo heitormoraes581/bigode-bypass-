@@ -2,6 +2,7 @@
 import{useEffect,useMemo,useState}from'react';
 import fallbackProducts from'../data/products.json';
 import{api,setToken}from'../lib/api-client';
+import{signOutSupabase}from'../lib/supabase-browser';
 import{addCartItem,cartCount,cartTotal,loadCart,saveCart}from'../lib/cart-client';
 
 const money=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',');
@@ -14,14 +15,14 @@ export default function Home(){
   const add=p=>{setCart(c=>addCartItem(c,p));setDrawer(true)};
   const change=(slug,delta)=>setCart(c=>c.map(x=>x.slug===slug?{...x,quantity:Math.max(1,(x.quantity||1)+delta)}:x));
   const remove=slug=>setCart(c=>c.filter(x=>x.slug!==slug));
-  const logout=()=>{setToken('');setUser(null);setProfile(false)};
+  const logout=async()=>{setToken('');await signOutSupabase();setUser(null);setProfile(false)};
   return <main>
     <div className="support">Alguma dúvida? <b>Abra um ticket em nosso servidor</b></div>
     <header>
       <a className="brand" href="/"><img className="brandLogo" src="/logo-bigode-bypass.png" alt="Bigode Bypass"/><div><strong>Bigode Bypass</strong><small>LOJA DIGITAL</small></div><i>✓</i></a>
       <div className="search"><span>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar produto"/></div>
       <div className="actions"><button className="headset" type="button">◉</button><div className="profileWrap">
-        <button className="profile" type="button" onClick={()=>user?setProfile(!profile):location.href='/conta'}><span>{user?.name?.slice(0,2).toUpperCase()||'BB'}</span><div><b>{user?.name||'Entrar'}</b><small>{user?'Meu perfil ⌄':'Acessar conta'}</small></div></button>
+        <button className="profile" type="button" onClick={()=>user?setProfile(!profile):location.href='/conta'}>{user?.avatar_url?<img className="profileAvatar" src={user.avatar_url} alt="Avatar"/>:<span>{user?.name?.slice(0,2).toUpperCase()||'BB'}</span>}<div><b>{user?.name||'Entrar'}</b><small>{user?'Meu perfil ⌄':'Acessar conta'}</small></div></button>
         {profile&&user&&<div className="profileMenu"><b>{user.name}</b><small>{user.email}</small><hr/><a href="/pedidos">▣ Meus pedidos</a>{user.role==='admin'&&<a href="/admin">⚙ Administração</a>}<button className="logout" onClick={logout}>↪ Sair da conta</button></div>}
       </div><button className="cartBtn" onClick={()=>setDrawer(true)}>🛒 Carrinho <b>{count}</b></button></div>
     </header>
