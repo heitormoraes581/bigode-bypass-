@@ -169,25 +169,12 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="banner">
+      <section className="banner officialBannerWrap">
         <img
-          className="bannerGhostLogo"
-          src="/logo-bigode-bypass.png"
-          alt=""
-          aria-hidden="true"
+          className="officialBanner"
+          src="/banner-bigode-bypass.png"
+          alt="Bigode Bypass"
         />
-
-        <div className="bannerGrid"></div>
-
-        <div className="bannerBrush bannerBrushLeft"></div>
-        <div className="bannerBrush bannerBrushRight"></div>
-
-        <div className="bannerLight"></div>
-
-        <div className="bannerText">
-          <strong>BIGODE</strong>
-          <span>BYPASS</span>
-        </div>
       </section>
 
       <section className="intro">
