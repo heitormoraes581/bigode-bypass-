@@ -31,7 +31,9 @@ const productImages={
  'bigode-remote':'/cards/bigode-remote.svg',
  'bigode-exclusive':'/cards/fivem-exclusive.svg',
  'bigode-pro':'/cards/fivem-pro.svg',
- 'bigode-1-1':'/cards/fivem-1-1.svg'
+ 'bigode-1-1':'/cards/fivem-1-1.svg',
+ 'bigode-fivem-remote':'/cards/bigode-fivem-remote.svg',
+ 'pass-basic':'/cards/pass-basic.svg'
 };
 const productImage=p=>p?.imageUrl||p?.image_url||productImages[p?.slug]||'/banner-bigode-bypass.png';
 
