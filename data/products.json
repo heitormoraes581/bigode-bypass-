@@ -9,7 +9,8 @@
     "tag": "BASIC",
     "tone": "green",
     "stock": 100,
-    "active": true
+    "active": true,
+    "imageUrl": "/cards/fivem-basic.svg"
   },
   {
     "id": 2,
@@ -21,7 +22,8 @@
     "tag": "ADVANCED",
     "tone": "purple",
     "stock": 100,
-    "active": true
+    "active": true,
+    "imageUrl": "/cards/fivem-advanced.svg"
   },
   {
     "id": 3,
@@ -33,7 +35,8 @@
     "tag": "PRIVATE",
     "tone": "pink",
     "stock": 100,
-    "active": true
+    "active": true,
+    "imageUrl": "/cards/fivem-private.svg"
   },
   {
     "id": 4,
@@ -45,7 +48,8 @@
     "tag": "SLOTTED",
     "tone": "cyan",
     "stock": 100,
-    "active": true
+    "active": true,
+    "imageUrl": "/cards/fivem-slotted.svg"
   },
   {
     "id": 5,
@@ -57,7 +61,8 @@
     "tag": "REMOTE",
     "tone": "blue",
     "stock": 50,
-    "active": true
+    "active": true,
+    "imageUrl": "/cards/bigode-remote.svg"
   },
   {
     "id": 6,
@@ -69,7 +74,8 @@
     "tag": "EXCLUSIVE",
     "tone": "orange",
     "stock": 30,
-    "active": true
+    "active": true,
+    "imageUrl": "/cards/fivem-exclusive.svg"
   },
   {
     "id": 7,
@@ -81,7 +87,8 @@
     "tag": "PRO",
     "tone": "violet",
     "stock": 30,
-    "active": true
+    "active": true,
+    "imageUrl": "/cards/fivem-pro.svg"
   },
   {
     "id": 8,
@@ -93,6 +100,7 @@
     "tag": "1:1",
     "tone": "blue",
     "stock": 10,
-    "active": true
+    "active": true,
+    "imageUrl": "/cards/fivem-1-1.svg"
   }
 ]
