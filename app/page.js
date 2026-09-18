@@ -12,7 +12,22 @@ const money=n=>'R$ '+n.toFixed(2).replace('.',',');
 export default function Home(){const[cart,setCart]=useState([]),[drawer,setDrawer]=useState(false),[query,setQuery]=useState(''),[profile,setProfile]=useState(false);const shown=products.filter(p=>p.name.toLowerCase().includes(query.toLowerCase()));const total=useMemo(()=>cart.reduce((a,p)=>a+p.price,0),[cart]);return <main>
 <div className="support">Alguma dúvida? <b>Abra um ticket em nosso servidor</b></div>
 <header><a className="brand" href="#"><img className="brandLogo" src="/logo-bigode-bypass.png" alt="Bigode Bypass"/><div><strong>Bigode Bypass</strong><small>LOJA DIGITAL</small></div><i>✓</i></a><div className="search">⌕<input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar produto"/></div><div className="actions"><button className="headset">◉</button><div className="profileWrap"><button className="profile" onClick={()=>setProfile(!profile)}><span>BB</span><div><b>Cliente</b><small>Meu perfil⌄</small></div></button>{profile&&<div className="profileMenu"><b>Minha conta</b><small>cliente@bigode.com</small><hr/><a href="/pedidos">▣ Meus pedidos</a><button className="logout">↪ Sair da conta</button></div>}</div><button className="cartBtn" onClick={()=>setDrawer(true)}>🛒 Carrinho <b>{cart.length}</b></button></div></header>
-<section className="banner"><div className="heroGlow"></div><img className="heroLogo" src="/logo-bigode-bypass.png" alt="Logo Bigode Bypass"/></section>
+<section className="banner">
+  <img
+    className="bannerGhostLogo"
+    src="/logo-bigode-bypass.png"
+    alt=""
+    aria-hidden="true"
+  />
+
+  <div className="bannerInk bannerInkLeft"></div>
+  <div className="bannerInk bannerInkRight"></div>
+
+  <div className="bannerText">
+    <strong>BIGODE</strong>
+    <span>BYPASS</span>
+  </div>
+</section>
 <section className="intro"><h1>Sua experiência em<br/><em>produtos digitais.</em></h1><p>Uma loja moderna, rápida e organizada, com atendimento eficiente e uma experiência de compra feita para PC.</p><a href="#produtos">Ver produtos　→</a></section>
 <section className="popular"><h2>Categorias populares</h2><div className="category"><img className="categoryLogo" src="/logo-bigode-bypass.png" alt="Bigode"/><strong>BIGODE</strong></div></section>
 <section id="produtos" className="catalog"><aside className="filters"><b>PRODUTOS</b><button className="active">BIGODE</button><button>DESTAQUES</button></aside><div className="productArea"><div className="tab">BIGODE</div><div className="products">{shown.map(p=><article className={'product '+p.tone} key={p.name}><div className="productArt"><img className="productLogo" src="/logo-bigode-bypass.png" alt="Bigode Bypass"/><strong>{p.tag}</strong><small>BIGODE BYPASS</small></div><div className="productBody"><h3>{p.name}</h3><div className="deal"><s>{money(p.old)}</s><span>⌁ {Math.round((1-p.price/p.old)*100)}% OFF</span></div><b className="amount">{money(p.price)}</b><small>À vista no Pix</small><button onClick={()=>{setCart([...cart,p]);setDrawer(true)}}>🛒　Comprar agora</button></div></article>)}</div></div></section>
