@@ -2683,3 +2683,61 @@ main[style] .product,main[style] .category,main[style] .why,main[style] footer{-
   .legalPage .termsCard{padding:16px 14px}
   .termMiniLogo{width:16px;height:16px;flex-basis:16px}
 }
+
+
+/* ===== Admin exports + backup ===== */
+.exportBtn{
+  flex:0 0 auto;
+  border:1px solid #30333d;
+  background:#11131a;
+  color:#e6e7eb;
+  border-radius:8px;
+  padding:10px 12px;
+  font-size:10px;
+  font-weight:800;
+  cursor:pointer;
+}
+.exportBtn:hover{
+  border-color:#4c5060;
+  background:#151820;
+}
+.backupGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+.backupCard{
+  border:1px solid #292c34;
+  border-radius:12px;
+  background:#0d0f14;
+  padding:20px;
+}
+.backupCard>span{
+  color:#7378ff;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:1.5px;
+}
+.backupCard h2{
+  margin:7px 0 8px;
+  font-size:18px;
+}
+.backupCard p{
+  margin:0 0 16px;
+  color:#8f929b;
+  font-size:11px;
+  line-height:1.6;
+}
+.backupCard button{
+  border:0;
+  border-radius:8px;
+  background:var(--blue,#2116ff);
+  color:#fff;
+  padding:10px 13px;
+  font-size:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+@media(max-width:850px){
+  .backupGrid{grid-template-columns:1fr}
+}
