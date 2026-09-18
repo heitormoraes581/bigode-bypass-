@@ -70,7 +70,7 @@ export default function Home(){
   return <main style={style}>
     <div className="support">{settings.supportText} <a href={settings.supportUrl||'#'}><b>{settings.supportCta}</b></a></div>
     <header>
-      <a className="brand" href="/"><img className="brandLogo" src={settings.logoUrl||'/logo-bigode-bypass.png'} alt={settings.siteName}/><div><strong>{settings.siteName}</strong><small>{settings.storeLabel}</small></div><i>✓</i></a>
+      <a className="brand headerBrand" href="/"><img className="brandLogo" src={settings.logoUrl||'/logo-bigode-bypass.png'} alt={settings.siteName}/><div className="brandCopy"><div className="brandTitleRow"><strong>{settings.siteName}</strong><span className="verifiedBadge" aria-label="Verificado">✓</span></div><small>{settings.storeLabel}</small></div></a>
       <div className="search"><span>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar produto"/></div>
       <div className="actions"><button className="headset" type="button">◉</button><div className="profileWrap">
         <button className="profile" type="button" onClick={()=>user?setProfile(!profile):location.href='/conta'}>{user?.avatar_url?<img className="profileAvatar" src={user.avatar_url} alt="Avatar"/>:<span>{user?.name?.slice(0,2).toUpperCase()||'BB'}</span>}<div><b>{user?.name||'Entrar'}</b><small>{user?'Meu perfil ⌄':'Acessar conta'}</small></div></button>
