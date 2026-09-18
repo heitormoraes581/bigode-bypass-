@@ -2349,3 +2349,33 @@ main[style] .product,main[style] .category,main[style] .why,main[style] footer{-
   transform:none;
   padding:0;
 }
+
+
+/* ===== Instagram-style verified badge ===== */
+.headerBrand .brandTitleRow{
+  align-items:center;
+  gap:5px;
+}
+.headerBrand .brandTitleRow strong{
+  line-height:16px;
+}
+.headerBrand .verifiedBadge{
+  width:17px!important;
+  height:17px!important;
+  min-width:17px;
+  flex:0 0 17px;
+  display:block;
+  padding:0!important;
+  margin:0 0 0 1px;
+  overflow:visible;
+  background:none!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  transform:none!important;
+}
+.headerBrand .verifiedBadge .verifiedShape{
+  fill:#0095F6;
+}
+.headerBrand .verifiedBadge .verifiedCheck{
+  fill:#fff;
+}
