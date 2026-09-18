@@ -2200,3 +2200,87 @@ main[style] .product,main[style] .category,main[style] .why,main[style] footer{-
   }
   .orderAdminCard{overflow-x:auto}
 }
+
+
+/* ===== Customer activity logs ===== */
+.activityNotice{
+  margin-bottom:14px;
+  padding:11px 13px;
+  border:1px solid #2a2d37;
+  border-radius:8px;
+  background:#0b0c11;
+  color:#8f929b;
+  font-size:10px;
+  line-height:1.5;
+}
+.activityList{
+  overflow:hidden;
+  border:1px solid #282a31;
+  border-radius:12px;
+  background:#0d0e13;
+}
+.activityRow{
+  display:grid;
+  grid-template-columns:10px minmax(0,1fr) auto;
+  gap:12px;
+  align-items:flex-start;
+  padding:13px 14px;
+  border-top:1px solid #22242b;
+}
+.activityRow:first-child{border-top:0}
+.activityIcon{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  margin-top:5px;
+  background:#71747f;
+  box-shadow:0 0 0 3px #ffffff08;
+}
+.activityIcon.add_to_cart,.activityIcon.checkout_submit{background:#36d978}
+.activityIcon.checkout_start,.activityIcon.product_click,.activityIcon.product_view{background:#4f61ff}
+.activityIcon.login_success{background:#5865f2}
+.activityIcon.coupon_attempt{background:#e6b84f}
+.activityIcon.logout{background:#a066ff}
+.activityMain{min-width:0}
+.activityMain>div{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.activityMain b{font-size:12px}
+.activityMain>div span{
+  color:#777a84;
+  font-size:10px;
+}
+.activityMain small{
+  display:block;
+  margin-top:4px;
+  color:#70737c;
+  font-size:9px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.activityMain code{
+  display:block;
+  margin-top:7px;
+  color:#a8aab2;
+  background:#090a0e;
+  border:1px solid #22242b;
+  border-radius:5px;
+  padding:6px 8px;
+  font-family:inherit;
+  font-size:9px;
+  white-space:normal;
+}
+.activityRow time{
+  color:#6f727b;
+  font-size:9px;
+  white-space:nowrap;
+  padding-top:2px;
+}
+@media(max-width:700px){
+  .activityRow{grid-template-columns:8px minmax(0,1fr)}
+  .activityRow time{grid-column:2;margin-top:2px}
+}
