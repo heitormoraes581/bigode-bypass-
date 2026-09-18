@@ -1,0 +1,8 @@
+'use client';
+import{useState}from'react';
+import{api,setToken}from'../../lib/api-client';
+export default function Register(){
+ const[name,setName]=useState(''),[email,setEmail]=useState(''),[cpf,setCpf]=useState(''),[password,setPassword]=useState(''),[msg,setMsg]=useState(''),[loading,setLoading]=useState(false);
+ const submit=async e=>{e.preventDefault();setLoading(true);setMsg('');try{const d=await api('/auth/register',{method:'POST',body:JSON.stringify({name,email,cpf,password})});setToken(d.token);location.href='/pedidos'}catch(e){setMsg(e.message)}finally{setLoading(false)}};
+ return <main className="authPage"><a className="authBrand" href="/"><img src="/logo-bigode-bypass.png"/><b>Bigode Bypass</b></a><section className="authCard"><span>NOVA CONTA</span><h1>Criar conta</h1><form onSubmit={submit}><label>Nome<input value={name} onChange={e=>setName(e.target.value)} maxLength="100" required/></label><label>E-mail<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required/></label><label>CPF<input value={cpf} onChange={e=>setCpf(e.target.value)} maxLength="14"/></label><label>Senha<input type="password" value={password} onChange={e=>setPassword(e.target.value)} minLength="6" required/></label>{msg&&<p className="formMessage">{msg}</p>}<button className="authSubmit" disabled={loading}>{loading?'Criando...':'Criar conta'}</button></form><p className="authSwitch">Já possui conta? <a href="/conta">Entrar</a></p></section></main>
+}
