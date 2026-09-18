@@ -85,6 +85,17 @@ export default function Admin(){
 
  const createCoupon=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{const d=await api('/admin/coupons',{method:'POST',body:JSON.stringify({code:f.get('code'),type:f.get('type'),value:Number(f.get('value')),maxUses:Number(f.get('maxUses'))||null})});setCoupons(x=>[d.coupon,...x]);e.currentTarget.reset();flash('Cupom criado.')}catch(e){flash(e.message)}};
  const status=async(o,s)=>{try{const note=prompt('Observação da mudança (opcional):')||'';const d=await api('/admin/orders/'+o.id,{method:'PATCH',body:JSON.stringify({status:s,note})});setOrders(xs=>xs.map(x=>x.id===o.id?d.order:x));if(d.event)setOrderEvents(x=>[...x,d.event]);flash('Pedido atualizado.')}catch(e){flash(e.message)}};
+ const deleteOrder=async o=>{
+   const extra=o.status==='pending'?' O estoque reservado será devolvido automaticamente.':'';
+   if(!confirm('Excluir definitivamente o pedido #'+o.id+'?'+extra+' Esta ação não pode ser desfeita.'))return;
+   try{
+     await api('/admin/orders/'+o.id,{method:'DELETE'});
+     setOrders(xs=>xs.filter(x=>x.id!==o.id));
+     setOrderEvents(xs=>xs.filter(x=>x.order_id!==o.id));
+     if(expandedOrder===o.id)setExpandedOrder(null);
+     flash('Pedido #'+o.id+' excluído.');
+   }catch(e){flash(e.message)}
+ };
 
  if(user===undefined)return <main className="adminLogin"><p>Carregando...</p></main>;
  if(!user||user.role!=='admin')return <main className="adminLogin"><form onSubmit={login}><img src="/logo-bigode-bypass.png"/><h1>Administração</h1><input type="email" placeholder="E-mail" value={email} onChange={e=>setEmail(e.target.value)} required/><input type="password" placeholder="Senha" value={password} onChange={e=>setPassword(e.target.value)} required/>{msg&&<p>{msg}</p>}<button>Entrar</button><a href="/">← Voltar para a loja</a></form></main>;
@@ -255,7 +266,7 @@ export default function Admin(){
      {tab==='orders'&&<>
        <div className="adminToolbar"><input value={orderQuery} onChange={e=>setOrderQuery(e.target.value)} placeholder="Buscar pedido, nome ou e-mail"/><select value={orderStatus} onChange={e=>setOrderStatus(e.target.value)}><option value="all">Todos os status</option><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select></div>
        <div className="adminTable"><h2>Pedidos</h2>{orders.filter(o=>(orderStatus==='all'||o.status===orderStatus)&&(!orderQuery||String(o.id).includes(orderQuery)||o.customer_email?.toLowerCase().includes(orderQuery.toLowerCase())||o.customer_name?.toLowerCase().includes(orderQuery.toLowerCase()))).map(o=><div className="orderAdminCard" key={o.id}>
-         <div className="adminOrderRow"><button className="orderToggle" onClick={()=>setExpandedOrder(expandedOrder===o.id?null:o.id)}>#{o.id}</button><span>{o.customer_email}</span><span>{money(o.total)}</span><select value={o.status} onChange={e=>status(o,e.target.value)}><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select></div>
+         <div className="adminOrderRow"><button className="orderToggle" onClick={()=>setExpandedOrder(expandedOrder===o.id?null:o.id)}>#{o.id}</button><span>{o.customer_email}</span><span>{money(o.total)}</span><select value={o.status} onChange={e=>status(o,e.target.value)}><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select><button className="deleteOrderBtn" onClick={()=>deleteOrder(o)} title="Excluir pedido">Excluir</button></div>
          {expandedOrder===o.id&&<div className="orderAdminDetails"><div><small>Cliente</small><b>{o.customer_name}</b><span>{o.customer_email}</span></div><div><small>Data</small><b>{new Date(o.created_at).toLocaleString('pt-BR')}</b><span>{o.payment_method||'pix'}</span></div><div><small>Itens</small>{(typeof o.items==='string'?JSON.parse(o.items):o.items||[]).map((it,i)=><span key={i}>{it.name} × {it.quantity}</span>)}</div><div><small>Histórico</small>{orderEvents.filter(ev=>ev.order_id===o.id).map(ev=><span key={ev.id}>{new Date(ev.created_at).toLocaleString('pt-BR')} — {ev.status}{ev.note?' · '+ev.note:''}</span>)}</div></div>}
        </div>)}{!orders.length&&<p>Nenhum pedido.</p>}</div>
      </>}
