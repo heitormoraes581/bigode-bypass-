@@ -1525,3 +1525,17 @@ footer{
 @media(max-width:1200px){.products{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:950px){.products{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.products{grid-template-columns:1fr}.catalog,.popular{padding:0 12px}.productArt{height:175px}}
+
+.productThumb{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.fivemCategory .categoryMark{
+  font-family:Arial,Helvetica,sans-serif;
+  font-style:normal;
+  font-weight:700;
+  font-size:16px;
+  letter-spacing:0;
+}
