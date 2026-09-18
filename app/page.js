@@ -30,12 +30,16 @@ export default function Home(){
 
     <section className="intro"><h1>Sua experiência em<br/><em>produtos digitais.</em></h1><p>Uma loja moderna, rápida e organizada, com atendimento eficiente e uma experiência de compra feita para PC.</p><a href="#produtos">Ver produtos　→</a></section>
 
-    <section className="popular"><h2>Categorias populares</h2><a className="category" href="#produtos"><img className="categoryLogo" src="/logo-bigode-bypass.png" alt="Bigode"/><strong>BIGODE</strong></a></section>
+    <section className="popular"><h2>Categorias populares</h2><a className="category fivemCategory" href="#produtos"><div className="categoryMark">FIVE<span>M</span></div><strong>FIVEM</strong></a></section>
 
-    <section id="produtos" className="catalog"><aside className="filters"><b>PRODUTOS</b><button className="active">BIGODE</button><button>DESTAQUES</button></aside><div className="productArea"><div className="tab">BIGODE</div><div className="products">
+    <section id="produtos" className="catalog"><aside className="filters"><b>CATEGORIAS</b><button className="active">FIVEM</button></aside><div className="productArea"><div className="tab">FIVEM</div><div className="products">
       {shown.map(p=><article className={'product '+(p.tone||'blue')} key={p.slug}>
-        <a className="productArt" href={'/produto?slug='+encodeURIComponent(p.slug)}><img className="productLogo" src="/logo-bigode-bypass.png" alt="Bigode Bypass"/><strong>{p.tag}</strong><small>BIGODE BYPASS</small></a>
-        <div className="productBody"><a href={'/produto?slug='+encodeURIComponent(p.slug)}><h3>{p.name}</h3></a><div className="deal"><s>{money(p.old)}</s><span>⌁ {p.old?Math.round((1-Number(p.price)/Number(p.old))*100):0}% OFF</span></div><b className="amount">{money(p.price)}</b><small>À vista no Pix · estoque {p.stock}</small><button onClick={()=>add(p)}>🛒 Comprar agora</button></div>
+        <a className="productArt" href={'/produto?slug='+encodeURIComponent(p.slug)}>
+          <div className="artGrid"></div>
+          <div className="artWord"><span>BIGODE</span><b>{p.tag}</b></div>
+          <small>FIVEM • BIGODE BYPASS</small>
+        </a>
+        <div className="productBody"><a href={'/produto?slug='+encodeURIComponent(p.slug)}><h3>{p.name}</h3></a><div className="deal"><s>{money(p.old)}</s><span>⌁ {p.old?Math.round((1-Number(p.price)/Number(p.old))*100):0}% OFF</span></div><b className="amount">{money(p.price)}</b><small>À vista no Pix</small><button onClick={()=>add(p)}>🛒 Comprar agora</button></div>
       </article>)}
       {!shown.length&&<div className="noResults">Nenhum produto encontrado.</div>}
     </div></div></section>
