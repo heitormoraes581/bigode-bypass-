@@ -1,7 +1,7 @@
 'use client';
 import{useEffect,useState}from'react';
 import{api,setToken}from'../../../lib/api-client';
-import{getSupabaseBrowser}from'../../../lib/supabase-browser';
+import{getSupabaseBrowser,signOutSupabase}from'../../../lib/supabase-browser';
 
 export default function DiscordCallback(){
  const[msg,setMsg]=useState('Conectando sua conta do Discord...');
@@ -12,7 +12,10 @@ export default function DiscordCallback(){
      done=true;
      try{
        const d=await api('/auth/discord',{method:'POST',body:JSON.stringify({accessToken:session.access_token})});
-       setToken(d.token);
+       const remember=sessionStorage.getItem('bb_remember_oauth')==='1';
+       setToken(d.token,remember);
+       sessionStorage.removeItem('bb_remember_oauth');
+       if(!remember)await signOutSupabase();
        setMsg('Login concluído. Redirecionando...');
        location.replace('/pedidos');
      }catch(e){
