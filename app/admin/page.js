@@ -11,27 +11,27 @@ const emptySettings={
  heroButton:'Ver produtos',popularTitle:'Categorias populares',
  footerText:'Produtos digitais com uma experiência rápida e suporte eficiente.',
  copyright:'Copyright © 2026 - Bigode Bypass.',termsLabel:'Termos e condições',termsUrl:'#',
- privacyLabel:'Privacidade',privacyUrl:'#',discordUrl:'#',youtubeUrl:'#',tiktokUrl:'#',
+ privacyLabel:'Privacidade',privacyUrl:'/privacidade',refundLabel:'Reembolso',refundUrl:'/reembolso',supportPageLabel:'Suporte',supportPageUrl:'/suporte',discordUrl:'#',youtubeUrl:'#',tiktokUrl:'#',
  primaryColor:'#2116ff',backgroundColor:'#07080b',panelColor:'#0d0e12',
  seoTitle:'Bigode Bypass',seoDescription:'Loja digital Bigode Bypass',
  why1Title:'⚡ Entrega digital',why1Text:'Processo rápido e organizado.',
  why2Title:'🔒 Compra segura',why2Text:'Checkout preparado para pagamento protegido.',
- why3Title:'🎧 Suporte',why3Text:'Atendimento para suas compras.'
+ why3Title:'🎧 Suporte',why3Text:'Atendimento para suas compras.',termsContent:'',privacyContent:'',refundContent:'',supportContent:''
 };
 
 export default function Admin(){
  const[user,setUser]=useState(undefined),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[tab,setTab]=useState('overview');
- const[metrics,setMetrics]=useState({}),[products,setProducts]=useState([]),[orders,setOrders]=useState([]),[coupons,setCoupons]=useState([]),[categories,setCategories]=useState([]),[settings,setSettings]=useState(emptySettings),[media,setMedia]=useState([]);
+ const[metrics,setMetrics]=useState({}),[products,setProducts]=useState([]),[orders,setOrders]=useState([]),[orderEvents,setOrderEvents]=useState([]),[customers,setCustomers]=useState([]),[coupons,setCoupons]=useState([]),[categories,setCategories]=useState([]),[settings,setSettings]=useState(emptySettings),[media,setMedia]=useState([]),[orderQuery,setOrderQuery]=useState(''),[orderStatus,setOrderStatus]=useState('all'),[customerQuery,setCustomerQuery]=useState(''),[expandedOrder,setExpandedOrder]=useState(null);
  const[msg,setMsg]=useState(''),[saving,setSaving]=useState(false);
 
  const load=async()=>{
    const me=await api('/auth/me');setUser(me.user);
    if(me.user.role!=='admin')return;
-   const[d,p,o,c,s,cat,m]=await Promise.all([
+   const[d,p,o,c,s,cat,m,cu]=await Promise.all([
      api('/admin/dashboard'),api('/admin/products'),api('/admin/orders'),api('/admin/coupons'),
-     api('/admin/site'),api('/admin/categories'),api('/admin/media')
+     api('/admin/site'),api('/admin/categories'),api('/admin/media'),api('/admin/customers')
    ]);
-   setMetrics(d);setProducts(p.products||[]);setOrders(o.orders||[]);setCoupons(c.coupons||[]);
+   setMetrics(d);setProducts(p.products||[]);setOrders(o.orders||[]);setOrderEvents(o.events||[]);setCustomers(cu.customers||[]);setCoupons(c.coupons||[]);
    setSettings({...emptySettings,...(s.settings||{})});setCategories(cat.categories||[]);setMedia(m.files||[]);
  };
  useEffect(()=>{load().catch(()=>setUser(null))},[]);
@@ -84,12 +84,12 @@ export default function Admin(){
  };
 
  const createCoupon=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{const d=await api('/admin/coupons',{method:'POST',body:JSON.stringify({code:f.get('code'),type:f.get('type'),value:Number(f.get('value')),maxUses:Number(f.get('maxUses'))||null})});setCoupons(x=>[d.coupon,...x]);e.currentTarget.reset();flash('Cupom criado.')}catch(e){flash(e.message)}};
- const status=async(o,s)=>{try{const d=await api('/admin/orders/'+o.id,{method:'PATCH',body:JSON.stringify({status:s})});setOrders(xs=>xs.map(x=>x.id===o.id?d.order:x));flash('Pedido atualizado.')}catch(e){flash(e.message)}};
+ const status=async(o,s)=>{try{const note=prompt('Observação da mudança (opcional):')||'';const d=await api('/admin/orders/'+o.id,{method:'PATCH',body:JSON.stringify({status:s,note})});setOrders(xs=>xs.map(x=>x.id===o.id?d.order:x));if(d.event)setOrderEvents(x=>[...x,d.event]);flash('Pedido atualizado.')}catch(e){flash(e.message)}};
 
  if(user===undefined)return <main className="adminLogin"><p>Carregando...</p></main>;
  if(!user||user.role!=='admin')return <main className="adminLogin"><form onSubmit={login}><img src="/logo-bigode-bypass.png"/><h1>Administração</h1><input type="email" placeholder="E-mail" value={email} onChange={e=>setEmail(e.target.value)} required/><input type="password" placeholder="Senha" value={password} onChange={e=>setPassword(e.target.value)} required/>{msg&&<p>{msg}</p>}<button>Entrar</button><a href="/">← Voltar para a loja</a></form></main>;
 
- const title={overview:'Visão geral',site:'Editar site',appearance:'Aparência',categories:'Categorias',media:'Mídia',products:'Produtos',orders:'Pedidos',coupons:'Cupons'}[tab]||'Administração';
+ const title={overview:'Visão geral',site:'Editar site',appearance:'Aparência',categories:'Categorias',media:'Mídia',products:'Produtos',customers:'Clientes',orders:'Pedidos',coupons:'Cupons'}[tab]||'Administração';
 
  return <main className="adminPage">
    <aside>
@@ -101,6 +101,7 @@ export default function Admin(){
      <button className={tab==='categories'?'active':''} onClick={()=>setTab('categories')}>▤ Categorias</button>
      <button className={tab==='media'?'active':''} onClick={()=>setTab('media')}>▧ Mídia</button>
      <button className={tab==='products'?'active':''} onClick={()=>setTab('products')}>▣ Produtos</button>
+     <button className={tab==='customers'?'active':''} onClick={()=>setTab('customers')}>◎ Clientes</button>
      <button className={tab==='orders'?'active':''} onClick={()=>setTab('orders')}>◫ Pedidos</button>
      <button className={tab==='coupons'?'active':''} onClick={()=>setTab('coupons')}>◇ Cupons</button>
      <a href="/">← Ver loja</a>
@@ -157,6 +158,16 @@ export default function Admin(){
          <Field label="Link dos termos" value={settings.termsUrl} onChange={v=>setS('termsUrl',v)}/>
          <Field label="Texto da privacidade" value={settings.privacyLabel} onChange={v=>setS('privacyLabel',v)}/>
          <Field label="Link da privacidade" value={settings.privacyUrl} onChange={v=>setS('privacyUrl',v)}/>
+         <Field label="Texto do reembolso" value={settings.refundLabel} onChange={v=>setS('refundLabel',v)}/>
+         <Field label="Link do reembolso" value={settings.refundUrl} onChange={v=>setS('refundUrl',v)}/>
+         <Field label="Texto do suporte" value={settings.supportPageLabel} onChange={v=>setS('supportPageLabel',v)}/>
+         <Field label="Link do suporte" value={settings.supportPageUrl} onChange={v=>setS('supportPageUrl',v)}/>
+       </CmsSection>
+       <CmsSection title="Páginas legais e suporte">
+         <Area label="Termos de uso" value={settings.termsContent} onChange={v=>setS('termsContent',v)}/>
+         <Area label="Privacidade" value={settings.privacyContent} onChange={v=>setS('privacyContent',v)}/>
+         <Area label="Reembolso" value={settings.refundContent} onChange={v=>setS('refundContent',v)}/>
+         <Area label="Suporte" value={settings.supportContent} onChange={v=>setS('supportContent',v)}/>
        </CmsSection>
        <CmsSection title="SEO">
          <Field label="Título do site" value={settings.seoTitle} onChange={v=>setS('seoTitle',v)}/>
@@ -231,7 +242,23 @@ export default function Admin(){
        </div>)}</div>
      </>}
 
-     {tab==='orders'&&<div className="adminTable"><h2>Pedidos</h2>{orders.map(o=><div className="adminOrderRow" key={o.id}><b>#{o.id}</b><span>{o.customer_email}</span><span>{money(o.total)}</span><select value={o.status} onChange={e=>status(o,e.target.value)}><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select></div>)}{!orders.length&&<p>Nenhum pedido.</p>}</div>}
+
+     {tab==='customers'&&<>
+       <div className="adminToolbar"><input value={customerQuery} onChange={e=>setCustomerQuery(e.target.value)} placeholder="Buscar por nome ou e-mail"/></div>
+       <div className="customerGrid">{customers.filter(x=>!customerQuery||x.name?.toLowerCase().includes(customerQuery.toLowerCase())||x.email?.toLowerCase().includes(customerQuery.toLowerCase())).map(x=><article className="customerCard" key={x.id}>
+         <div className="customerHead">{x.avatar_url?<img src={x.avatar_url} alt=""/>:<span>{(x.name||'C').slice(0,1).toUpperCase()}</span>}<div><b>{x.name}</b><small>{x.email}</small></div></div>
+         <div className="customerStats"><div><small>PEDIDOS</small><b>{x.orders||0}</b></div><div><small>PAGOS</small><b>{x.paidOrders||0}</b></div><div><small>TOTAL PAGO</small><b>{money(x.totalPaid||0)}</b></div></div>
+         <div className="customerMeta"><span>{x.auth_provider==='discord'?'Discord':'E-mail'}</span><span>{x.role==='admin'?'Administrador':'Cliente'}</span>{x.lastOrderAt&&<span>Último pedido: {new Date(x.lastOrderAt).toLocaleDateString('pt-BR')}</span>}</div>
+       </article>)}{!customers.length&&<p>Nenhum cliente cadastrado.</p>}</div>
+     </>}
+
+     {tab==='orders'&&<>
+       <div className="adminToolbar"><input value={orderQuery} onChange={e=>setOrderQuery(e.target.value)} placeholder="Buscar pedido, nome ou e-mail"/><select value={orderStatus} onChange={e=>setOrderStatus(e.target.value)}><option value="all">Todos os status</option><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select></div>
+       <div className="adminTable"><h2>Pedidos</h2>{orders.filter(o=>(orderStatus==='all'||o.status===orderStatus)&&(!orderQuery||String(o.id).includes(orderQuery)||o.customer_email?.toLowerCase().includes(orderQuery.toLowerCase())||o.customer_name?.toLowerCase().includes(orderQuery.toLowerCase()))).map(o=><div className="orderAdminCard" key={o.id}>
+         <div className="adminOrderRow"><button className="orderToggle" onClick={()=>setExpandedOrder(expandedOrder===o.id?null:o.id)}>#{o.id}</button><span>{o.customer_email}</span><span>{money(o.total)}</span><select value={o.status} onChange={e=>status(o,e.target.value)}><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select></div>
+         {expandedOrder===o.id&&<div className="orderAdminDetails"><div><small>Cliente</small><b>{o.customer_name}</b><span>{o.customer_email}</span></div><div><small>Data</small><b>{new Date(o.created_at).toLocaleString('pt-BR')}</b><span>{o.payment_method||'pix'}</span></div><div><small>Itens</small>{(typeof o.items==='string'?JSON.parse(o.items):o.items||[]).map((it,i)=><span key={i}>{it.name} × {it.quantity}</span>)}</div><div><small>Histórico</small>{orderEvents.filter(ev=>ev.order_id===o.id).map(ev=><span key={ev.id}>{new Date(ev.created_at).toLocaleString('pt-BR')} — {ev.status}{ev.note?' · '+ev.note:''}</span>)}</div></div>}
+       </div>)}{!orders.length&&<p>Nenhum pedido.</p>}</div>
+     </>}
 
      {tab==='coupons'&&<><form className="couponAdmin" onSubmit={createCoupon}><input name="code" placeholder="Código" required/><select name="type"><option value="percent">Percentual</option><option value="fixed">Valor fixo</option></select><input name="value" type="number" step="0.01" placeholder="Valor" required/><input name="maxUses" type="number" placeholder="Limite de usos"/><button>Criar cupom</button></form><div className="adminTable"><h2>Cupons</h2>{coupons.map(c=><div className="adminCouponRow" key={c.id}><b>{c.code}</b><span>{c.type==='percent'?c.value+'%':money(c.value)}</span><span>{c.used_count||0}/{c.max_uses||'∞'}</span><em>{c.active?'Ativo':'Inativo'}</em></div>)}</div></>}
    </section>
