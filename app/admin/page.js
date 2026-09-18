@@ -35,6 +35,8 @@ export default function Admin(){
    setSettings({...emptySettings,...(s.settings||{})});setCategories(cat.categories||[]);setMedia(m.files||[]);setActivity(a.activity||[]);
  };
  useEffect(()=>{load().catch(()=>setUser(null))},[]);
+ const refreshActivity=async()=>{try{const a=await api('/admin/activity');setActivity(a.activity||[])}catch{}};
+ useEffect(()=>{if(tab!=='activity'||user?.role!=='admin')return;refreshActivity();const id=setInterval(refreshActivity,10000);return()=>clearInterval(id)},[tab,user?.role]);
 
  const login=async e=>{e.preventDefault();try{const d=await api('/auth/login',{method:'POST',body:JSON.stringify({email,password})});setToken(d.token);await load()}catch(e){setMsg(e.message)}};
  const flash=t=>{setMsg(t);setTimeout(()=>setMsg(''),2500)};
@@ -266,7 +268,7 @@ export default function Admin(){
 
 
      {tab==='activity'&&<>
-       <div className="activityNotice">Registra somente eventos de navegação e compra. Não registra senhas, conteúdo digitado em campos sensíveis nem dados completos de pagamento.</div>
+       <div className="activityNotice"><span>Registra somente eventos de navegação e compra. Não registra senhas, conteúdo digitado em campos sensíveis nem dados completos de pagamento.</span><button onClick={refreshActivity}>Atualizar agora</button></div>
        <div className="adminToolbar"><input value={activityQuery} onChange={e=>setActivityQuery(e.target.value)} placeholder="Buscar cliente, página, produto ou sessão"/><select value={activityType} onChange={e=>setActivityType(e.target.value)}><option value="all">Todos os eventos</option><option value="page_view">Página acessada</option><option value="category_select">Categoria selecionada</option><option value="product_click">Produto clicado</option><option value="product_view">Produto visualizado</option><option value="add_to_cart">Adicionou ao carrinho</option><option value="cart_open">Abriu carrinho</option><option value="checkout_start">Iniciou checkout</option><option value="checkout_submit">Criou/tentou pedido</option><option value="coupon_attempt">Tentou cupom</option><option value="login_click">Tentou login</option><option value="login_success">Login realizado</option><option value="logout">Logout</option></select></div>
        <div className="activityList">{activity.filter(x=>{
          const q=activityQuery.toLowerCase();
