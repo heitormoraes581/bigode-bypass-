@@ -2305,3 +2305,47 @@ main[style] .product,main[style] .category,main[style] .why,main[style] footer{-
 @media(max-width:650px){
   .activityNotice{align-items:flex-start;flex-direction:column}
 }
+
+
+/* ===== Header verified badge alignment ===== */
+.headerBrand{
+  gap:10px;
+}
+.headerBrand .brandCopy{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:0;
+}
+.headerBrand .brandTitleRow{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+  line-height:1;
+}
+.headerBrand .brandTitleRow strong{
+  display:block;
+  margin:0;
+  line-height:1.1;
+}
+.headerBrand .brandCopy>small{
+  margin-top:4px;
+}
+.headerBrand .verifiedBadge{
+  width:16px;
+  height:16px;
+  flex:0 0 16px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:#398cff;
+  color:#fff;
+  font-size:9px;
+  font-weight:900;
+  line-height:1;
+  box-shadow:0 0 0 2px rgba(57,140,255,.12);
+  transform:none;
+  padding:0;
+}
