@@ -2284,3 +2284,24 @@ main[style] .product,main[style] .category,main[style] .why,main[style] footer{-
   .activityRow{grid-template-columns:8px minmax(0,1fr)}
   .activityRow time{grid-column:2;margin-top:2px}
 }
+
+.activityNotice{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.activityNotice button{
+  flex:0 0 auto;
+  border:1px solid #333743;
+  background:#11131a;
+  color:#c5c7ce;
+  border-radius:7px;
+  padding:7px 10px;
+  font-size:9px;
+  font-weight:800;
+}
+.activityNotice button:hover{border-color:#4a4f5f;color:#fff}
+@media(max-width:650px){
+  .activityNotice{align-items:flex-start;flex-direction:column}
+}
