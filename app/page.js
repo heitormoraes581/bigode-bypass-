@@ -102,13 +102,13 @@ export default function Home(){
 
     <footer><div><div className="brand foot"><img className="footerLogo" src={settings.logoUrl||'/logo-bigode-bypass.png'} alt={settings.siteName}/><strong>{settings.siteName}</strong></div><p>{settings.footerText}</p></div><div className="social">
   <a href={settings.discordUrl||'#'} aria-label="Discord" title="Discord">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.4 7.2c1.5-1.1 7.7-1.1 9.2 0 .9 1.4 1.7 3.9 1.6 6.3-1.1 1.6-2.7 2.5-4.1 2.9l-.9-1.2c.8-.2 1.6-.6 2.2-1.1-2.1 1-4.7 1-6.8 0 .6.5 1.4.9 2.2 1.1l-.9 1.2c-1.4-.4-3-1.3-4.1-2.9-.1-2.4.7-4.9 1.6-6.3Zm2.2 5.5c.7 0 1.2-.6 1.2-1.3s-.5-1.3-1.2-1.3-1.2.6-1.2 1.3.5 1.3 1.2 1.3Zm4.8 0c.7 0 1.2-.6 1.2-1.3s-.5-1.3-1.2-1.3-1.2.6-1.2 1.3.5 1.3 1.2 1.3Z"/></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 5.3A16.4 16.4 0 0 0 15.4 4l-.5 1.1a15.1 15.1 0 0 0-5.8 0L8.6 4a16.5 16.5 0 0 0-4.1 1.3C1.9 9.1 1.2 12.8 1.6 16.4a16.6 16.6 0 0 0 5 2.5l1.2-1.7a10.7 10.7 0 0 1-1.9-.9l.5-.4c3.7 1.7 7.7 1.7 11.3 0l.6.4a12 12 0 0 1-1.9.9l1.2 1.7a16.5 16.5 0 0 0 5-2.5c.5-4.2-.8-7.8-3.1-11.1ZM8.6 14.3c-1.1 0-2-1-2-2.2s.9-2.2 2-2.2 2 1 2 2.2-.9 2.2-2 2.2Zm6.8 0c-1.1 0-2-1-2-2.2s.9-2.2 2-2.2 2 1 2 2.2-.9 2.2-2 2.2Z"/></svg>
   </a>
   <a href={settings.youtubeUrl||'#'} aria-label="YouTube" title="YouTube">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 7.2a2.8 2.8 0 0 0-2-2C16.8 4.7 12 4.7 12 4.7s-4.8 0-6.5.5a2.8 2.8 0 0 0-2 2C3 8.9 3 12 3 12s0 3.1.5 4.8a2.8 2.8 0 0 0 2 2c1.7.5 6.5.5 6.5.5s4.8 0 6.5-.5a2.8 2.8 0 0 0 2-2c.5-1.7.5-4.8.5-4.8s0-3.1-.5-4.8ZM10.2 15.2V8.8l5.5 3.2-5.5 3.2Z"/></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.8 31.8 0 0 0 0 12a31.8 31.8 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.8 31.8 0 0 0 24 12a31.8 31.8 0 0 0-.5-5.8ZM9.6 15.6V8.4L15.8 12l-6.2 3.6Z"/></svg>
   </a>
   <a href={settings.tiktokUrl||'#'} aria-label="TikTok" title="TikTok">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.4 4h2.3c.2 1.5 1.1 2.7 2.7 3.2v2.4c-1.1 0-2.1-.3-3-.9v5.4a5 5 0 1 1-4.3-5v2.5a2.6 2.6 0 1 0 1.9 2.5V4h.4Z"/></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.6 7.1a5.4 5.4 0 0 1-3.2-3.1h-2.7v13a2.8 2.8 0 1 1-2-2.7V11.5a5.5 5.5 0 1 0 4.7 5.5v-6.6a8.1 8.1 0 0 0 3.2.7V7.1Z"/></svg>
   </a>
 </div><div className="copy">{settings.copyright}</div><div className="links"><a href={settings.termsUrl||'/termos'}>{settings.termsLabel||'Termos'}</a>　 <a href={settings.privacyUrl||'/privacidade'}>{settings.privacyLabel||'Privacidade'}</a>　 <a href={settings.refundUrl||'/reembolso'}>{settings.refundLabel||'Reembolso'}</a>　 <a href={settings.supportPageUrl||'/suporte'}>{settings.supportPageLabel||'Suporte'}</a></div></footer>
 
