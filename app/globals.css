@@ -2572,3 +2572,114 @@ main[style] .product,main[style] .category,main[style] .why,main[style] footer{-
   .legalDocument{padding:15px 14px}
   .legalDocument p{font-size:11px}
 }
+
+
+/* ===== Terms page final rebuild ===== */
+.legalPage.termsPage{
+  min-height:100vh;
+  background:#07080b!important;
+}
+.legalPage .legalHeader{
+  max-width:1180px;
+  margin:0 auto;
+  padding:14px 18px;
+}
+.legalPage .legalShell{
+  width:min(980px,calc(100% - 32px));
+  margin:42px auto 88px;
+}
+.legalPage .legalEyebrow{
+  display:block;
+  margin:0 0 5px;
+  color:var(--blue,#2116ff);
+  font-size:9px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:1.6px;
+}
+.legalPage .legalShell>h1{
+  margin:0 0 24px;
+  color:#fff;
+  font-size:28px;
+  line-height:1.08;
+  letter-spacing:-.45px;
+}
+.legalPage .termsCard{
+  padding:20px 22px;
+  border:1px solid #282a31;
+  border-radius:8px;
+  background:#0d0f13;
+  box-shadow:0 12px 32px rgba(0,0,0,.16);
+}
+.termsSectionHead,
+.termsSubhead{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.termsSectionHead{
+  margin:1px 0 13px;
+}
+.termsSubhead{
+  margin:0 0 5px;
+}
+.termMiniLogo{
+  width:18px;
+  height:18px;
+  flex:0 0 18px;
+  border-radius:4px;
+  object-fit:cover;
+}
+.termsSectionHead h2{
+  margin:0;
+  color:#fff;
+  font-size:15px;
+  line-height:1.35;
+  font-weight:900;
+}
+.termsSubhead h3{
+  margin:0;
+  color:#fff;
+  font-size:12px;
+  line-height:1.4;
+  font-weight:800;
+}
+.termsParagraph{
+  margin:0;
+  color:#c8cad0;
+  font-size:11px;
+  line-height:1.58;
+}
+.termsGap{height:14px}
+.termsDivider{
+  height:1px;
+  border:0;
+  background:#34363e;
+  margin:20px 0;
+}
+.termsBullet{
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  margin:5px 0;
+}
+.termsBullet>span{
+  color:#fff;
+  font-size:11px;
+  line-height:1.58;
+}
+.termsBullet p{
+  margin:0;
+  color:#c8cad0;
+  font-size:11px;
+  line-height:1.58;
+}
+@media(max-width:700px){
+  .legalPage .legalShell{
+    width:min(100% - 22px,980px);
+    margin:26px auto 60px;
+  }
+  .legalPage .legalShell>h1{font-size:24px}
+  .legalPage .termsCard{padding:16px 14px}
+  .termMiniLogo{width:16px;height:16px;flex-basis:16px}
+}
