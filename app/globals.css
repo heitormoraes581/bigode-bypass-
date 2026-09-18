@@ -1679,3 +1679,20 @@ main[style] .product,main[style] .category,main[style] .why,main[style] footer{-
 .miniUpload{font-size:9px!important;padding:6px!important;color:#777!important}
 @media(max-width:950px){.mediaGrid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.mediaGrid{grid-template-columns:1fr}.mediaUploader{align-items:flex-start;flex-direction:column}}
+
+.rememberRow{
+  display:flex!important;
+  align-items:center;
+  gap:9px;
+  margin-top:14px!important;
+  color:#b7b8bf!important;
+  font-size:12px!important;
+  cursor:pointer;
+}
+.rememberRow input{
+  width:16px!important;
+  height:16px!important;
+  margin:0!important;
+  accent-color:var(--blue,#2116ff);
+}
+.rememberRow span{user-select:none}
