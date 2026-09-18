@@ -1413,3 +1413,43 @@ footer{
     text-align:left;
   }
 }
+
+
+/* Banner oficial em imagem */
+.officialBannerWrap{
+  height:auto!important;
+  aspect-ratio:auto!important;
+  max-width:1180px;
+  margin:42px auto 0;
+  padding:0;
+  background:#07080b!important;
+  border:1px solid #171a28;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 20px 60px #0006;
+  display:block!important;
+}
+.officialBannerWrap::before,
+.officialBannerWrap::after{
+  display:none!important;
+}
+.officialBanner{
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:contain;
+  object-position:center;
+}
+@media(max-width:1000px){
+  .officialBannerWrap{
+    margin:20px!important;
+    height:auto!important;
+  }
+}
+@media(max-width:700px){
+  .officialBannerWrap{
+    margin:16px 12px 0!important;
+    height:auto!important;
+    border-radius:12px;
+  }
+}
