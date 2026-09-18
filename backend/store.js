@@ -1,4 +1,5 @@
 const bcrypt=require('bcryptjs');
+const crypto=require('crypto');
 const {Pool}=require('pg');
 const defaults=require('../data/products.json');
 
@@ -57,8 +58,12 @@ async function memory(){
   if(!global.__bbStore)global.__bbStore={products:defaults.map(x=>({...x})),users:[],coupons:[],orders:[],ids:{user:1,product:Math.max(...defaults.map(x=>x.id))+1,coupon:1,order:1}};
   const s=global.__bbStore;
   if(!memReady)memReady=(async()=>{
-    if(process.env.ADMIN_EMAIL&&process.env.ADMIN_PASSWORD&&!s.users.find(x=>x.email===process.env.ADMIN_EMAIL.toLowerCase())){
-      s.users.push({id:s.ids.user++,name:'Administrador',email:process.env.ADMIN_EMAIL.toLowerCase(),cpf:'',password_hash:await bcrypt.hash(process.env.ADMIN_PASSWORD,12),role:'admin',created_at:new Date().toISOString()});
+    const adminEmail=(process.env.ADMIN_EMAIL||'admin@bigode.local').toLowerCase();
+    if(!global.__bbBootstrapPassword)global.__bbBootstrapPassword=process.env.ADMIN_PASSWORD||crypto.randomBytes(12).toString('base64url');
+    const adminPassword=global.__bbBootstrapPassword;
+    if(!s.users.find(x=>x.email===adminEmail)){
+      s.users.push({id:s.ids.user++,name:'Administrador',email:adminEmail,cpf:'',password_hash:await bcrypt.hash(adminPassword,12),role:'admin',created_at:new Date().toISOString()});
+      console.log('[Bigode] Admin bootstrap:',adminEmail,'password:',adminPassword);
     }
   })();
   await memReady;return s;
