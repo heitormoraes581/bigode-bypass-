@@ -64,7 +64,7 @@ export default function Home(){
   const add=p=>{setCart(c=>addCartItem(c,p));trackEvent('add_to_cart',{product:p.slug,quantity:1});setDrawer(true)};
   const change=(slug,delta)=>setCart(c=>c.map(x=>x.slug===slug?{...x,quantity:Math.max(1,(x.quantity||1)+delta)}:x));
   const remove=slug=>setCart(c=>c.filter(x=>x.slug!==slug));
-  const logout=async()=>{trackEvent('logout',{source:'home'});setToken('');await signOutSupabase();setUser(null);setProfile(false)};
+  const logout=async()=>{trackEvent('logout',{source:'home'});try{await api('/auth/logout',{method:'POST'})}catch{}setToken('');await signOutSupabase();setUser(null);setProfile(false)};
 
   const style={'--blue':settings.primaryColor||'#2116ff','--bg':settings.backgroundColor||'#07080b','--panel':settings.panelColor||'#0d0e12'};
   return <main style={style}>
