@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "api": "node server.js"
+    "api": "node server.js",
+    "prebuild": "npm audit --omit=dev || true"
   },
   "dependencies": {
     "next": "15.5.24",
