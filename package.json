@@ -14,5 +14,8 @@
     "react-dom": "19.2.8",
     "@supabase/supabase-js": "2.116.0"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "overrides": {
+    "postcss": "8.5.23"
+  }
 }
