@@ -1600,3 +1600,63 @@ footer{
   border-radius:50%;
   object-fit:cover;
 }
+
+
+/* ===== CMS / site editor ===== */
+.adminTopline{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:18px}
+.adminTopline h1{margin-top:8px}
+.publishBtn{border:0;background:#2116ff;color:#fff;padding:11px 16px;border-radius:8px;font-weight:800}
+.publishBtn:disabled{opacity:.55}
+.cmsIntro p{color:#9b9ca4;line-height:1.7}
+.cmsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.cmsSection{background:#0d0e13;border:1px solid #282a31;border-radius:12px;padding:20px}
+.cmsSection h2{margin:0 0 16px;font-size:17px}
+.cmsField{display:block;color:#8e9098;font-size:10px;margin-top:12px;letter-spacing:.2px}
+.cmsField input,.cmsField textarea,.productCreateForm input,.productCreateForm select,.productCreateForm textarea,.cmsCreateRow input,.categoryAdminRow input,.productEditor input,.productEditor select,.productEditor textarea{
+  width:100%;margin-top:6px;background:#090a0e;border:1px solid #2b2d34;border-radius:7px;padding:10px;color:#fff;outline:none
+}
+.cmsField textarea,.productCreateForm textarea,.productEditor textarea{min-height:86px;resize:vertical}
+.colorField>div{display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:center}
+.colorField input[type=color]{padding:2px;height:42px}
+.appearanceGrid{grid-template-columns:minmax(320px,520px) minmax(260px,1fr)}
+.themePreview{min-height:300px;border-radius:12px;padding:20px;background:var(--preview-bg);border:1px solid #2a2b31}
+.themePreview>small{color:#777;letter-spacing:2px}
+.previewCard{margin-top:30px;padding:22px;border:1px solid #34353d;border-radius:12px;background:var(--preview-panel);display:grid;gap:12px}
+.previewCard span{color:#999}
+.previewCard button{border:0;background:var(--preview-primary);color:#fff;border-radius:8px;padding:12px;font-weight:800}
+.cmsCreateRow{display:grid;grid-template-columns:1.1fr 1fr 2fr 110px 150px;gap:10px;margin-bottom:18px}
+.cmsCreateRow button{border:0;border-radius:7px;background:#2116ff;color:white;font-weight:800}
+.categoryAdminRow{grid-template-columns:1.1fr 1fr 2fr 100px 100px!important;gap:10px}
+.categoryAdminRow label,.productEditor label{font-size:10px;color:#777}
+.categoryAdminRow .switchLabel{padding-top:22px}
+.productCreateForm{background:#0d0e13;border:1px solid #282a31;border-radius:12px;padding:20px;margin-bottom:18px}
+.productCreateForm h2{margin-top:0}
+.productCreateGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.productCreateGrid textarea{grid-column:span 2}
+.productCreateForm>.publishBtn{margin-top:12px}
+.productEditor{display:block!important;border-top:1px solid #24252b;padding:18px 0!important}
+.productEditorHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.productEditorHead small{display:block;color:#666;margin-top:4px}
+.productEditorHead a{font-size:11px;color:#7f82ff}
+.productEditorGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.productEditorGrid .wide{grid-column:span 3}
+.productEditorGrid .switchLabel{align-self:end;padding-bottom:8px}
+.categoryList{display:flex;gap:12px;flex-wrap:wrap}
+.category.selected{border-color:var(--blue,#2116ff);box-shadow:0 0 0 1px var(--blue,#2116ff) inset}
+.categoryTabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.categoryTabs button{border:1px solid #2a2b31;background:#0c0d11;color:#b0b1b7;border-radius:8px;padding:10px 16px;font-weight:700}
+.categoryTabs button.active{background:var(--blue,#2116ff);border-color:var(--blue,#2116ff);color:white}
+main[style]{background:var(--bg);min-height:100vh}
+main[style] header{background:color-mix(in srgb,var(--bg) 94%,#111)}
+main[style] .product,main[style] .category,main[style] .why,main[style] footer{--local-panel:var(--panel)}
+@media(max-width:1100px){
+  .cmsGrid,.appearanceGrid{grid-template-columns:1fr}
+  .cmsCreateRow{grid-template-columns:1fr 1fr}
+  .productCreateGrid,.productEditorGrid{grid-template-columns:1fr 1fr}
+  .productEditorGrid .wide{grid-column:span 2}
+}
+@media(max-width:700px){
+  .cmsCreateRow,.productCreateGrid,.productEditorGrid{grid-template-columns:1fr}
+  .productEditorGrid .wide{grid-column:span 1}
+  .adminTopline{flex-direction:column}
+}
