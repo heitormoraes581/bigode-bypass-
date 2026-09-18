@@ -2379,3 +2379,42 @@ main[style] .product,main[style] .category,main[style] .why,main[style] footer{-
 .headerBrand .verifiedBadge .verifiedCheck{
   fill:#fff;
 }
+
+
+/* ===== Footer social icons ===== */
+.social{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  font-size:0;
+}
+.social a{
+  width:42px;
+  height:42px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:#0b0c10;
+  border:1px solid #1c1e25;
+  color:#fff;
+  box-shadow:0 3px 12px rgba(0,0,0,.28);
+  transition:transform .16s ease,border-color .16s ease,background .16s ease;
+}
+.social a:hover{
+  transform:translateY(-2px);
+  background:#101218;
+  border-color:#343844;
+}
+.social svg{
+  width:19px;
+  height:19px;
+  display:block;
+  fill:currentColor;
+}
+@media(max-width:700px){
+  footer{grid-template-columns:1fr}
+  .social{justify-content:flex-start;margin-top:18px}
+  .links{text-align:left}
+}
