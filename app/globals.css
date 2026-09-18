@@ -1487,3 +1487,41 @@ footer{
 .adminOrderRow{grid-template-columns:70px 1fr 120px 140px!important;gap:12px}.adminOrderRow select,.couponAdmin select,.couponAdmin input{background:#090a0e;border:1px solid #2b2d34;color:white;border-radius:7px;padding:9px}
 .couponAdmin{display:grid;grid-template-columns:1fr 150px 130px 150px 120px;gap:10px;margin-bottom:18px}.couponAdmin button{border:0;background:#2116ff;color:white;border-radius:7px;font-weight:800}.adminCouponRow{grid-template-columns:1fr 130px 120px 90px!important}
 @media(max-width:900px){.orderCard{grid-template-columns:1fr 1fr}.productDetail{grid-template-columns:1fr}.productHero{min-height:300px}.metrics{grid-template-columns:1fr 1fr}.adminProductRow,.adminOrderRow,.adminCouponRow{grid-template-columns:1fr!important}.couponAdmin{grid-template-columns:1fr}}
+
+
+/* ===== FiveM catalog visual refinement ===== */
+.catalog{max-width:1400px;grid-template-columns:1fr;padding:0 8px}
+.filters{display:none}
+.productArea{width:100%}
+.tab{font-size:14px;padding:11px 18px;margin-bottom:32px;background:#0b0c10;border-color:#2f25ff}
+.products{grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.product{border:2px solid #25262c;border-radius:11px;background:#0b0b0e}
+.product:hover{transform:translateY(-2px);border-color:#343643}
+.productArt{height:145px;overflow:hidden;background:#06070a;isolation:isolate}
+.productArt::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 85% 18%,color-mix(in srgb,var(--tone,#2116ff) 34%,transparent),transparent 38%),
+    linear-gradient(135deg,color-mix(in srgb,var(--tone,#2116ff) 9%,transparent),transparent 58%);
+  z-index:-1
+}
+.artGrid{position:absolute;inset:0;opacity:.16;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:24px 24px;mask-image:linear-gradient(to bottom,#000,transparent 95%)}
+.artWord{position:relative;z-index:2;display:flex;align-items:baseline;gap:10px;transform:rotate(-3deg)}
+.artWord span{font-family:Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;font-size:34px;font-style:italic;letter-spacing:-1px;color:#fff;text-shadow:3px 3px 0 #000}
+.artWord b{font-family:Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;font-size:25px;font-style:italic;color:var(--tone,#2116ff);text-shadow:2px 2px 0 #000}
+.productArt small{left:12px;right:auto;bottom:9px;color:#777;letter-spacing:1px}
+.productBody{padding:14px 12px 12px}
+.product h3{font-size:15px;margin-bottom:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.deal s{font-size:12px}
+.deal span{font-size:10px;border:1px solid #252cff;background:#0b0d35;color:#505cff}
+.amount{font-size:20px;margin-top:5px}
+.amount+small{font-size:13px;margin-top:3px;margin-bottom:16px}
+.productBody>button{padding:12px 10px;background:#2116ff;font-size:13px}
+.popular{max-width:1400px;padding:0 8px}
+.category{width:165px;height:190px}
+.categoryMark{font-family:Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;font-size:36px;font-style:italic;letter-spacing:-1px}
+.categoryMark span{color:#3128ff}
+.fivemCategory{background:radial-gradient(circle at 60% 40%,#141540,#090a0e 65%)}
+@media(max-width:1200px){.products{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:950px){.products{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.products{grid-template-columns:1fr}.catalog,.popular{padding:0 12px}.productArt{height:175px}}
