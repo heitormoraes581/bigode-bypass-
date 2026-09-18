@@ -74,7 +74,7 @@ export default function Home(){
       </button>)}
     </div></section>
 
-    <section id="produtos" className="catalog"><div className="productArea"><div className="categoryTabs">{categories.filter(c=>c.active!==false).map(c=><button className={category===c.slug?'active':''} key={c.id||c.slug} onClick={()=>setCategory(c.slug)}>{c.name}</button>)}</div><div className="products">
+    <section id="produtos" className="catalog"><div className="productArea"><div className="catalogHeader"><div><small>CATÁLOGO</small><h2>{categories.find(c=>c.slug===category)?.name||'Produtos'}</h2></div><span>{shown.length} {shown.length===1?'produto':'produtos'}</span></div><div className="products">
       {shown.map(p=><article className={'product '+(p.tone||'blue')} key={p.slug}>
         <a className="productArt" href={'/produto?slug='+encodeURIComponent(p.slug)}>
           <img className="productThumb" src={p.imageUrl||'/banner-bigode-bypass.png'} alt={p.name}/>
