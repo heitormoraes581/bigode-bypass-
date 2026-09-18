@@ -102,5 +102,31 @@
     "stock": 10,
     "active": true,
     "imageUrl": "/cards/fivem-1-1.svg"
+  },
+  {
+    "id": 9,
+    "slug": "bigode-fivem-remote",
+    "name": "Bigode FiveM Remote",
+    "description": "O Bigode FiveM Remote foi desenvolvido para quem busca mais praticidade e organização em servidores de Role Play. A configuração pode ser acompanhada remotamente por telefone, tablet, notebook externo, computador secundário ou monitor auxiliar. O uso de um dispositivo secundário é recomendado para uma melhor experiência, mas o produto também pode ser utilizado no monitor principal. Não exige hardware adicional para a configuração.",
+    "old": 3000,
+    "price": 2000,
+    "tag": "REMOTE",
+    "tone": "blue",
+    "stock": 50,
+    "active": true,
+    "imageUrl": "/cards/bigode-fivem-remote.svg"
+  },
+  {
+    "id": 10,
+    "slug": "pass-basic",
+    "name": "Pass Basic",
+    "description": "ADQUIRIR ESTE PRODUTO APENAS SE VOCÊ JÁ TIVER ADQUIRIDO O BYPASS BASIC ANTERIORMENTE.",
+    "old": 20,
+    "price": 12.9,
+    "tag": "PASS BASIC",
+    "tone": "cyan",
+    "stock": 100,
+    "active": true,
+    "imageUrl": "/cards/pass-basic.svg"
   }
 ]
