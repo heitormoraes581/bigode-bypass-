@@ -165,9 +165,6 @@ export default function Admin(){
        <CmsSection title="Rodapé e redes">
          <Area label="Texto do rodapé" value={settings.footerText} onChange={v=>setS('footerText',v)}/>
          <Field label="Copyright" value={settings.copyright} onChange={v=>setS('copyright',v)}/>
-         <Field label="Discord" value={settings.discordUrl} onChange={v=>setS('discordUrl',v)}/>
-         <Field label="YouTube" value={settings.youtubeUrl} onChange={v=>setS('youtubeUrl',v)}/>
-         <Field label="TikTok" value={settings.tiktokUrl} onChange={v=>setS('tiktokUrl',v)}/>
          <Field label="Texto dos termos" value={settings.termsLabel} onChange={v=>setS('termsLabel',v)}/>
          <Field label="Link dos termos" value={settings.termsUrl} onChange={v=>setS('termsUrl',v)}/>
          <Field label="Texto da privacidade" value={settings.privacyLabel} onChange={v=>setS('privacyLabel',v)}/>
@@ -176,6 +173,12 @@ export default function Admin(){
          <Field label="Link do reembolso" value={settings.refundUrl} onChange={v=>setS('refundUrl',v)}/>
          <Field label="Texto do suporte" value={settings.supportPageLabel} onChange={v=>setS('supportPageLabel',v)}/>
          <Field label="Link do suporte" value={settings.supportPageUrl} onChange={v=>setS('supportPageUrl',v)}/>
+       </CmsSection>
+       <CmsSection title="Links das redes sociais">
+         <p className="cmsHelp">Cole o link completo de cada perfil. Esses links são usados nos ícones do rodapé.</p>
+         <Field label="Discord" value={settings.discordUrl} onChange={v=>setS('discordUrl',v)}/>
+         <Field label="YouTube" value={settings.youtubeUrl} onChange={v=>setS('youtubeUrl',v)}/>
+         <Field label="TikTok" value={settings.tiktokUrl} onChange={v=>setS('tiktokUrl',v)}/>
        </CmsSection>
        <CmsSection title="Páginas legais e suporte">
          <Area label="Termos de uso" value={settings.termsContent} onChange={v=>setS('termsContent',v)}/>
