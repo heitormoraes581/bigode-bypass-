@@ -21,18 +21,18 @@ const emptySettings={
 
 export default function Admin(){
  const[user,setUser]=useState(undefined),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[tab,setTab]=useState('overview');
- const[metrics,setMetrics]=useState({}),[products,setProducts]=useState([]),[orders,setOrders]=useState([]),[coupons,setCoupons]=useState([]),[categories,setCategories]=useState([]),[settings,setSettings]=useState(emptySettings);
+ const[metrics,setMetrics]=useState({}),[products,setProducts]=useState([]),[orders,setOrders]=useState([]),[coupons,setCoupons]=useState([]),[categories,setCategories]=useState([]),[settings,setSettings]=useState(emptySettings),[media,setMedia]=useState([]);
  const[msg,setMsg]=useState(''),[saving,setSaving]=useState(false);
 
  const load=async()=>{
    const me=await api('/auth/me');setUser(me.user);
    if(me.user.role!=='admin')return;
-   const[d,p,o,c,s,cat]=await Promise.all([
+   const[d,p,o,c,s,cat,m]=await Promise.all([
      api('/admin/dashboard'),api('/admin/products'),api('/admin/orders'),api('/admin/coupons'),
-     api('/admin/site'),api('/admin/categories')
+     api('/admin/site'),api('/admin/categories'),api('/admin/media')
    ]);
    setMetrics(d);setProducts(p.products||[]);setOrders(o.orders||[]);setCoupons(c.coupons||[]);
-   setSettings({...emptySettings,...(s.settings||{})});setCategories(cat.categories||[]);
+   setSettings({...emptySettings,...(s.settings||{})});setCategories(cat.categories||[]);setMedia(m.files||[]);
  };
  useEffect(()=>{load().catch(()=>setUser(null))},[]);
 
@@ -45,6 +45,14 @@ export default function Admin(){
    catch(e){flash(e.message)}finally{setSaving(false)}
  };
  const setS=(k,v)=>setSettings(x=>({...x,[k]:v}));
+ const uploadMedia=async(file)=>{
+   if(!file)return null;
+   const fd=new FormData();fd.append('file',file);
+   const d=await api('/admin/upload',{method:'POST',body:fd});
+   setMedia(x=>[{name:d.name,url:d.url,createdAt:new Date().toISOString()},...x]);
+   flash('Imagem enviada.');
+   return d.url;
+ };
 
  const patchProduct=async(p,changes)=>{
    try{const d=await api('/admin/products/'+p.id,{method:'PATCH',body:JSON.stringify(changes)});setProducts(xs=>xs.map(x=>x.id===p.id?d.product:x));flash('Produto atualizado.')}
@@ -81,7 +89,7 @@ export default function Admin(){
  if(user===undefined)return <main className="adminLogin"><p>Carregando...</p></main>;
  if(!user||user.role!=='admin')return <main className="adminLogin"><form onSubmit={login}><img src="/logo-bigode-bypass.png"/><h1>Administração</h1><input type="email" placeholder="E-mail" value={email} onChange={e=>setEmail(e.target.value)} required/><input type="password" placeholder="Senha" value={password} onChange={e=>setPassword(e.target.value)} required/>{msg&&<p>{msg}</p>}<button>Entrar</button><a href="/">← Voltar para a loja</a></form></main>;
 
- const title={overview:'Visão geral',site:'Editar site',appearance:'Aparência',categories:'Categorias',products:'Produtos',orders:'Pedidos',coupons:'Cupons'}[tab]||'Administração';
+ const title={overview:'Visão geral',site:'Editar site',appearance:'Aparência',categories:'Categorias',media:'Mídia',products:'Produtos',orders:'Pedidos',coupons:'Cupons'}[tab]||'Administração';
 
  return <main className="adminPage">
    <aside>
@@ -91,6 +99,7 @@ export default function Admin(){
      <button className={tab==='site'?'active':''} onClick={()=>setTab('site')}>✎ Editar site</button>
      <button className={tab==='appearance'?'active':''} onClick={()=>setTab('appearance')}>◐ Aparência</button>
      <button className={tab==='categories'?'active':''} onClick={()=>setTab('categories')}>▤ Categorias</button>
+     <button className={tab==='media'?'active':''} onClick={()=>setTab('media')}>▧ Mídia</button>
      <button className={tab==='products'?'active':''} onClick={()=>setTab('products')}>▣ Produtos</button>
      <button className={tab==='orders'?'active':''} onClick={()=>setTab('orders')}>◫ Pedidos</button>
      <button className={tab==='coupons'?'active':''} onClick={()=>setTab('coupons')}>◇ Cupons</button>
@@ -115,7 +124,7 @@ export default function Admin(){
        <CmsSection title="Marca e cabeçalho">
          <Field label="Nome da loja" value={settings.siteName} onChange={v=>setS('siteName',v)}/>
          <Field label="Texto abaixo do nome" value={settings.storeLabel} onChange={v=>setS('storeLabel',v)}/>
-         <Field label="URL da logo" value={settings.logoUrl} onChange={v=>setS('logoUrl',v)}/>
+         <MediaField label="Logo" value={settings.logoUrl} onChange={v=>setS('logoUrl',v)} upload={uploadMedia}/>
        </CmsSection>
        <CmsSection title="Barra de aviso">
          <Field label="Texto" value={settings.supportText} onChange={v=>setS('supportText',v)}/>
@@ -123,7 +132,7 @@ export default function Admin(){
          <Field label="Link" value={settings.supportUrl} onChange={v=>setS('supportUrl',v)}/>
        </CmsSection>
        <CmsSection title="Banner e destaque">
-         <Field label="URL do banner" value={settings.bannerUrl} onChange={v=>setS('bannerUrl',v)}/>
+         <MediaField label="Banner principal" value={settings.bannerUrl} onChange={v=>setS('bannerUrl',v)} upload={uploadMedia}/>
          <Field label="Título" value={settings.heroTitle} onChange={v=>setS('heroTitle',v)}/>
          <Field label="Texto em destaque" value={settings.heroHighlight} onChange={v=>setS('heroHighlight',v)}/>
          <Area label="Descrição" value={settings.heroText} onChange={v=>setS('heroText',v)}/>
@@ -166,6 +175,11 @@ export default function Admin(){
        </div>
      </div>}
 
+     {tab==='media'&&<>
+       <div className="mediaUploader"><div><h2>Biblioteca de mídia</h2><p>Envie logos, banners e imagens dos produtos. Formatos: PNG, JPG, WebP, GIF ou SVG, até 10 MB.</p></div><label className="uploadBtn">Enviar imagem<input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" onChange={async e=>{const file=e.target.files?.[0];if(file)await uploadMedia(file);e.target.value=''}}/></label></div>
+       <div className="mediaGrid">{media.map((m,i)=><article className="mediaCard" key={(m.url||'')+i}><img src={m.url} alt={m.name}/><div><b>{m.name}</b><input value={m.url} readOnly onFocus={e=>e.target.select()}/></div></article>)}{!media.length&&<p className="emptyMedia">Nenhuma imagem enviada pelo painel ainda.</p>}</div>
+     </>}
+
      {tab==='categories'&&<>
        <form className="cmsCreateRow" onSubmit={createCategory}>
          <input name="name" placeholder="Nome da categoria" required/>
@@ -177,7 +191,7 @@ export default function Admin(){
        <div className="adminTable"><h2>Categorias</h2>{categories.map(c=><div className="categoryAdminRow" key={c.id}>
          <label>Nome<input defaultValue={c.name} onBlur={e=>patchCategory(c,{name:e.target.value})}/></label>
          <label>Slug<input defaultValue={c.slug} onBlur={e=>patchCategory(c,{slug:e.target.value})}/></label>
-         <label>Imagem<input defaultValue={c.image_url||''} onBlur={e=>patchCategory(c,{imageUrl:e.target.value})}/></label>
+         <label>Imagem<input defaultValue={c.image_url||''} onBlur={e=>patchCategory(c,{imageUrl:e.target.value})}/><input className="miniUpload" type="file" accept="image/*" onChange={async e=>{const u=await uploadMedia(e.target.files?.[0]);if(u)patchCategory(c,{imageUrl:u});e.target.value=''}}/></label>
          <label>Ordem<input type="number" defaultValue={c.sort_order||0} onBlur={e=>patchCategory(c,{sortOrder:Number(e.target.value)})}/></label>
          <label className="switchLabel"><input type="checkbox" defaultChecked={c.active} onChange={e=>patchCategory(c,{active:e.target.checked})}/> Ativa</label>
        </div>)}</div>
@@ -210,7 +224,7 @@ export default function Admin(){
            <label>Tag<input defaultValue={p.tag||''} onBlur={e=>patchProduct(p,{tag:e.target.value})}/></label>
            <label>Categoria<select defaultValue={p.categorySlug||'fivem'} onChange={e=>patchProduct(p,{categorySlug:e.target.value})}>{categories.map(c=><option key={c.id} value={c.slug}>{c.name}</option>)}</select></label>
            <label>Ordem<input type="number" defaultValue={p.sortOrder||0} onBlur={e=>patchProduct(p,{sortOrder:Number(e.target.value)})}/></label>
-           <label>Imagem<input defaultValue={p.imageUrl||''} onBlur={e=>patchProduct(p,{imageUrl:e.target.value})}/></label>
+           <label>Imagem<input defaultValue={p.imageUrl||''} onBlur={e=>patchProduct(p,{imageUrl:e.target.value})}/><input className="miniUpload" type="file" accept="image/*" onChange={async e=>{const u=await uploadMedia(e.target.files?.[0]);if(u)patchProduct(p,{imageUrl:u});e.target.value=''}}/></label>
            <label className="wide">Descrição<textarea defaultValue={p.description||''} onBlur={e=>patchProduct(p,{description:e.target.value})}></textarea></label>
            <label className="switchLabel"><input type="checkbox" defaultChecked={p.active} onChange={e=>patchProduct(p,{active:e.target.checked})}/> Produto ativo</label>
          </div>
@@ -228,3 +242,5 @@ function CmsSection({title,children}){return <div className="cmsSection"><h2>{ti
 function Field({label,value,onChange}){return <label className="cmsField">{label}<input value={value||''} onChange={e=>onChange(e.target.value)}/></label>}
 function Area({label,value,onChange}){return <label className="cmsField">{label}<textarea value={value||''} onChange={e=>onChange(e.target.value)}/></label>}
 function ColorField({label,value,onChange}){return <label className="cmsField colorField">{label}<div><input type="color" value={value||'#000000'} onChange={e=>onChange(e.target.value)}/><input value={value||''} onChange={e=>onChange(e.target.value)}/></div></label>}
+
+function MediaField({label,value,onChange,upload}){return <label className="cmsField mediaField">{label}<div className="mediaFieldRow"><input value={value||''} onChange={e=>onChange(e.target.value)}/><label className="miniUploadBtn">Upload<input type="file" accept="image/*" onChange={async e=>{const u=await upload(e.target.files?.[0]);if(u)onChange(u);e.target.value=''}}/></label></div>{value&&<img className="mediaPreview" src={value} alt="Prévia"/>}</label>}
