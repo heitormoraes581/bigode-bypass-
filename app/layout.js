@@ -1,0 +1,1 @@
+import './globals.css'; export const metadata={title:'Bigode Bypass',description:'Loja digital Bigode'}; export default function RootLayout({children}){return <html lang="pt-BR"><body>{children}</body></html>}
