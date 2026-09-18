@@ -1,0 +1,1 @@
+import LegalPage from'../../lib/legal-page';export default function Page(){return <LegalPage type="refund" title="Política de reembolso"/>}
