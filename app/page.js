@@ -23,6 +23,18 @@ const fallbackSettings={
 };
 const fallbackCategories=[{id:1,slug:'fivem',name:'FIVEM',image_url:'',active:true,sort_order:1}];
 const money=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',');
+const productImages={
+ 'bigode-basic':'/cards/fivem-basic.svg',
+ 'bigode-advanced':'/cards/fivem-advanced.svg',
+ 'bigode-premium':'/cards/fivem-private.svg',
+ 'bigode-ultimate':'/cards/fivem-slotted.svg',
+ 'bigode-remote':'/cards/bigode-remote.svg',
+ 'bigode-exclusive':'/cards/fivem-exclusive.svg',
+ 'bigode-pro':'/cards/fivem-pro.svg',
+ 'bigode-1-1':'/cards/fivem-1-1.svg'
+};
+const productImage=p=>p?.imageUrl||p?.image_url||productImages[p?.slug]||'/banner-bigode-bypass.png';
+
 
 export default function Home(){
   const[products,setProducts]=useState(fallbackProducts),[categories,setCategories]=useState(fallbackCategories),[settings,setSettings]=useState(fallbackSettings);
@@ -79,7 +91,7 @@ export default function Home(){
     <section id="produtos" className="catalog"><div className="productArea"><div className="catalogHeader"><div><small>CATÁLOGO</small><h2>{categories.find(c=>c.slug===category)?.name||'Produtos'}</h2></div><span>{shown.length} {shown.length===1?'produto':'produtos'}</span></div><div className="products">
       {shown.map(p=><article className={'product '+(p.tone||'blue')} key={p.slug}>
         <a className="productArt" onClick={()=>trackEvent('product_click',{product:p.slug,source:'image'})} href={'/produto?slug='+encodeURIComponent(p.slug)}>
-          <img className="productThumb" src={p.imageUrl||'/banner-bigode-bypass.png'} alt={p.name}/>
+          <img className="productThumb" src={productImage(p)} alt={p.name}/>
         </a>
         <div className="productBody"><a onClick={()=>trackEvent('product_click',{product:p.slug,source:'title'})} href={'/produto?slug='+encodeURIComponent(p.slug)}><h3>{p.name}</h3></a><div className="deal"><s>{money(p.old)}</s><span>⌁ {p.old?Math.round((1-Number(p.price)/Number(p.old))*100):0}% OFF</span></div><b className="amount">{money(p.price)}</b><small>À vista no Pix</small><button onClick={()=>add(p)}>🛒 Comprar agora</button></div>
       </article>)}
