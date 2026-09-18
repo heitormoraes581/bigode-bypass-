@@ -21,18 +21,18 @@ const emptySettings={
 
 export default function Admin(){
  const[user,setUser]=useState(undefined),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[tab,setTab]=useState('overview');
- const[metrics,setMetrics]=useState({}),[products,setProducts]=useState([]),[orders,setOrders]=useState([]),[orderEvents,setOrderEvents]=useState([]),[customers,setCustomers]=useState([]),[coupons,setCoupons]=useState([]),[categories,setCategories]=useState([]),[settings,setSettings]=useState(emptySettings),[media,setMedia]=useState([]),[orderQuery,setOrderQuery]=useState(''),[orderStatus,setOrderStatus]=useState('all'),[customerQuery,setCustomerQuery]=useState(''),[expandedOrder,setExpandedOrder]=useState(null);
+ const[metrics,setMetrics]=useState({}),[products,setProducts]=useState([]),[orders,setOrders]=useState([]),[orderEvents,setOrderEvents]=useState([]),[customers,setCustomers]=useState([]),[coupons,setCoupons]=useState([]),[categories,setCategories]=useState([]),[settings,setSettings]=useState(emptySettings),[media,setMedia]=useState([]),[activity,setActivity]=useState([]),[activityQuery,setActivityQuery]=useState(''),[activityType,setActivityType]=useState('all'),[orderQuery,setOrderQuery]=useState(''),[orderStatus,setOrderStatus]=useState('all'),[customerQuery,setCustomerQuery]=useState(''),[expandedOrder,setExpandedOrder]=useState(null);
  const[msg,setMsg]=useState(''),[saving,setSaving]=useState(false);
 
  const load=async()=>{
    const me=await api('/auth/me');setUser(me.user);
    if(me.user.role!=='admin')return;
-   const[d,p,o,c,s,cat,m,cu]=await Promise.all([
+   const[d,p,o,c,s,cat,m,cu,a]=await Promise.all([
      api('/admin/dashboard'),api('/admin/products'),api('/admin/orders'),api('/admin/coupons'),
-     api('/admin/site'),api('/admin/categories'),api('/admin/media'),api('/admin/customers')
+     api('/admin/site'),api('/admin/categories'),api('/admin/media'),api('/admin/customers'),api('/admin/activity')
    ]);
    setMetrics(d);setProducts(p.products||[]);setOrders(o.orders||[]);setOrderEvents(o.events||[]);setCustomers(cu.customers||[]);setCoupons(c.coupons||[]);
-   setSettings({...emptySettings,...(s.settings||{})});setCategories(cat.categories||[]);setMedia(m.files||[]);
+   setSettings({...emptySettings,...(s.settings||{})});setCategories(cat.categories||[]);setMedia(m.files||[]);setActivity(a.activity||[]);
  };
  useEffect(()=>{load().catch(()=>setUser(null))},[]);
 
@@ -100,7 +100,7 @@ export default function Admin(){
  if(user===undefined)return <main className="adminLogin"><p>Carregando...</p></main>;
  if(!user||user.role!=='admin')return <main className="adminLogin"><form onSubmit={login}><img src="/logo-bigode-bypass.png"/><h1>Administração</h1><input type="email" placeholder="E-mail" value={email} onChange={e=>setEmail(e.target.value)} required/><input type="password" placeholder="Senha" value={password} onChange={e=>setPassword(e.target.value)} required/>{msg&&<p>{msg}</p>}<button>Entrar</button><a href="/">← Voltar para a loja</a></form></main>;
 
- const title={overview:'Visão geral',site:'Editar site',appearance:'Aparência',categories:'Categorias',media:'Mídia',products:'Produtos',customers:'Clientes',orders:'Pedidos',coupons:'Cupons'}[tab]||'Administração';
+ const title={overview:'Visão geral',site:'Editar site',appearance:'Aparência',categories:'Categorias',media:'Mídia',products:'Produtos',customers:'Clientes',activity:'Atividade',orders:'Pedidos',coupons:'Cupons'}[tab]||'Administração';
 
  return <main className="adminPage">
    <aside>
@@ -113,6 +113,7 @@ export default function Admin(){
      <button className={tab==='media'?'active':''} onClick={()=>setTab('media')}>▧ Mídia</button>
      <button className={tab==='products'?'active':''} onClick={()=>setTab('products')}>▣ Produtos</button>
      <button className={tab==='customers'?'active':''} onClick={()=>setTab('customers')}>◎ Clientes</button>
+     <button className={tab==='activity'?'active':''} onClick={()=>setTab('activity')}>◌ Atividade</button>
      <button className={tab==='orders'?'active':''} onClick={()=>setTab('orders')}>◫ Pedidos</button>
      <button className={tab==='coupons'?'active':''} onClick={()=>setTab('coupons')}>◇ Cupons</button>
      <a href="/">← Ver loja</a>
@@ -263,6 +264,21 @@ export default function Admin(){
        </article>)}{!customers.length&&<p>Nenhum cliente cadastrado.</p>}</div>
      </>}
 
+
+     {tab==='activity'&&<>
+       <div className="activityNotice">Registra somente eventos de navegação e compra. Não registra senhas, conteúdo digitado em campos sensíveis nem dados completos de pagamento.</div>
+       <div className="adminToolbar"><input value={activityQuery} onChange={e=>setActivityQuery(e.target.value)} placeholder="Buscar cliente, página, produto ou sessão"/><select value={activityType} onChange={e=>setActivityType(e.target.value)}><option value="all">Todos os eventos</option><option value="page_view">Página acessada</option><option value="category_select">Categoria selecionada</option><option value="product_click">Produto clicado</option><option value="product_view">Produto visualizado</option><option value="add_to_cart">Adicionou ao carrinho</option><option value="cart_open">Abriu carrinho</option><option value="checkout_start">Iniciou checkout</option><option value="checkout_submit">Criou/tentou pedido</option><option value="coupon_attempt">Tentou cupom</option><option value="login_click">Tentou login</option><option value="login_success">Login realizado</option><option value="logout">Logout</option></select></div>
+       <div className="activityList">{activity.filter(x=>{
+         const q=activityQuery.toLowerCase();
+         const hay=[x.page,x.session_id,x.event_type,x.bb_users?.name,x.bb_users?.email,JSON.stringify(x.metadata||{})].filter(Boolean).join(' ').toLowerCase();
+         return (activityType==='all'||x.event_type===activityType)&&(!q||hay.includes(q));
+       }).map(x=><article className="activityRow" key={x.id}>
+         <div className={'activityIcon '+x.event_type}></div>
+         <div className="activityMain"><div><b>{eventLabel(x.event_type)}</b><span>{x.bb_users?.name||'Visitante'}</span></div><small>{x.bb_users?.email||'Sessão '+String(x.session_id).slice(0,12)} · {x.page||'/'}</small>{Object.keys(x.metadata||{}).length>0&&<code>{Object.entries(x.metadata).map(([k,v])=>k+': '+v).join(' · ')}</code>}</div>
+         <time>{new Date(x.created_at).toLocaleString('pt-BR')}</time>
+       </article>)}{!activity.length&&<p>Nenhum evento registrado ainda.</p>}</div>
+     </>}
+
      {tab==='orders'&&<>
        <div className="adminToolbar"><input value={orderQuery} onChange={e=>setOrderQuery(e.target.value)} placeholder="Buscar pedido, nome ou e-mail"/><select value={orderStatus} onChange={e=>setOrderStatus(e.target.value)}><option value="all">Todos os status</option><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select></div>
        <div className="adminTable"><h2>Pedidos</h2>{orders.filter(o=>(orderStatus==='all'||o.status===orderStatus)&&(!orderQuery||String(o.id).includes(orderQuery)||o.customer_email?.toLowerCase().includes(orderQuery.toLowerCase())||o.customer_name?.toLowerCase().includes(orderQuery.toLowerCase()))).map(o=><div className="orderAdminCard" key={o.id}>
@@ -282,3 +298,21 @@ function Area({label,value,onChange}){return <label className="cmsField">{label}
 function ColorField({label,value,onChange}){return <label className="cmsField colorField">{label}<div><input type="color" value={value||'#000000'} onChange={e=>onChange(e.target.value)}/><input value={value||''} onChange={e=>onChange(e.target.value)}/></div></label>}
 
 function MediaField({label,value,onChange,upload}){return <label className="cmsField mediaField">{label}<div className="mediaFieldRow"><input value={value||''} onChange={e=>onChange(e.target.value)}/><label className="miniUploadBtn">Upload<input type="file" accept="image/*" onChange={async e=>{const u=await upload(e.target.files?.[0]);if(u)onChange(u);e.target.value=''}}/></label></div>{value&&<img className="mediaPreview" src={value} alt="Prévia"/>}</label>}
+
+function eventLabel(type){
+ const labels={
+  page_view:'Página acessada',
+  category_select:'Categoria selecionada',
+  product_click:'Produto clicado',
+  product_view:'Produto visualizado',
+  add_to_cart:'Adicionou ao carrinho',
+  cart_open:'Abriu o carrinho',
+  checkout_start:'Iniciou checkout',
+  checkout_submit:'Ação no checkout',
+  coupon_attempt:'Tentou cupom',
+  login_click:'Tentou login',
+  login_success:'Login realizado',
+  logout:'Saiu da conta'
+ };
+ return labels[type]||type;
+}
