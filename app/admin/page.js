@@ -3,6 +3,21 @@ import{useEffect,useState}from'react';
 import{api,setToken}from'../../lib/api-client';
 
 const money=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',');
+
+function downloadFile(name,content,type='application/json'){
+ const blob=new Blob([content],{type});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+function csvEscape(v){
+ const s=String(v??'').replace(/"/g,'""');
+ return '"'+s+'"';
+}
+function downloadCsv(name,headers,rows){
+ const csv='\ufeff'+[headers,...rows].map(r=>r.map(csvEscape).join(';')).join('\n');
+ downloadFile(name,csv,'text/csv;charset=utf-8');
+}
 const emptySettings={
  siteName:'Bigode Bypass',storeLabel:'LOJA DIGITAL',logoUrl:'/logo-bigode-bypass.png',
  supportText:'Alguma dúvida?',supportCta:'Abra um ticket em nosso servidor',supportUrl:'#',
@@ -87,6 +102,34 @@ export default function Admin(){
 
  const createCoupon=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{const d=await api('/admin/coupons',{method:'POST',body:JSON.stringify({code:f.get('code'),type:f.get('type'),value:Number(f.get('value')),maxUses:Number(f.get('maxUses'))||null})});setCoupons(x=>[d.coupon,...x]);e.currentTarget.reset();flash('Cupom criado.')}catch(e){flash(e.message)}};
  const status=async(o,s)=>{try{const note=prompt('Observação da mudança (opcional):')||'';const d=await api('/admin/orders/'+o.id,{method:'PATCH',body:JSON.stringify({status:s,note})});setOrders(xs=>xs.map(x=>x.id===o.id?d.order:x));if(d.event)setOrderEvents(x=>[...x,d.event]);flash('Pedido atualizado.')}catch(e){flash(e.message)}};
+ const exportCustomers=()=>downloadCsv('bigode-clientes.csv',
+   ['ID','Nome','E-mail','Login','Tipo','Pedidos','Pedidos pagos','Total pago','Último pedido'],
+   customers.map(x=>[x.id,x.name,x.email,x.auth_provider||'',x.role||'',x.orders||0,x.paidOrders||0,Number(x.totalPaid||0).toFixed(2),x.lastOrderAt||''])
+ );
+ const exportOrders=()=>downloadCsv('bigode-pedidos.csv',
+   ['ID','Cliente','E-mail','Status','Subtotal','Desconto','Total','Pagamento','Criado em'],
+   orders.map(o=>[o.id,o.customer_name,o.customer_email,o.status,o.subtotal,o.discount,o.total,o.payment_method,o.created_at])
+ );
+ const exportActivity=()=>downloadCsv('bigode-atividade.csv',
+   ['ID','Cliente','E-mail','Evento','Página','Sessão','Detalhes','Data'],
+   activity.map(x=>[x.id,x.bb_users?.name||'Visitante',x.bb_users?.email||'',eventLabel(x.event_type),x.page||'',x.session_id||'',JSON.stringify(x.metadata||{}),x.created_at])
+ );
+ const exportBackup=()=>{
+   const backup={
+     exportedAt:new Date().toISOString(),
+     version:1,
+     site:settings,
+     categories,
+     products,
+     coupons,
+     orders,
+     orderEvents,
+     customers:customers.map(({id,name,email,role,avatar_url,auth_provider,created_at,orders,paidOrders,totalPaid,lastOrderAt})=>({id,name,email,role,avatar_url,auth_provider,created_at,orders,paidOrders,totalPaid,lastOrderAt}))
+   };
+   downloadFile('bigode-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(backup,null,2));
+   flash('Backup gerado.');
+ };
+
  const deleteOrder=async o=>{
    const extra=o.status==='pending'?' O estoque reservado será devolvido automaticamente.':'';
    if(!confirm('Excluir definitivamente o pedido #'+o.id+'?'+extra+' Esta ação não pode ser desfeita.'))return;
@@ -102,7 +145,7 @@ export default function Admin(){
  if(user===undefined)return <main className="adminLogin"><p>Carregando...</p></main>;
  if(!user||user.role!=='admin')return <main className="adminLogin"><form onSubmit={login}><img src="/logo-bigode-bypass.png"/><h1>Administração</h1><input type="email" placeholder="E-mail" value={email} onChange={e=>setEmail(e.target.value)} required/><input type="password" placeholder="Senha" value={password} onChange={e=>setPassword(e.target.value)} required/>{msg&&<p>{msg}</p>}<button>Entrar</button><a href="/">← Voltar para a loja</a></form></main>;
 
- const title={overview:'Visão geral',site:'Editar site',appearance:'Aparência',categories:'Categorias',media:'Mídia',products:'Produtos',customers:'Clientes',activity:'Atividade',orders:'Pedidos',coupons:'Cupons'}[tab]||'Administração';
+ const title={overview:'Visão geral',site:'Editar site',appearance:'Aparência',categories:'Categorias',media:'Mídia',products:'Produtos',customers:'Clientes',activity:'Atividade',orders:'Pedidos',coupons:'Cupons',backup:'Backup e exportação'}[tab]||'Administração';
 
  return <main className="adminPage">
    <aside>
@@ -118,6 +161,7 @@ export default function Admin(){
      <button className={tab==='activity'?'active':''} onClick={()=>setTab('activity')}>◌ Atividade</button>
      <button className={tab==='orders'?'active':''} onClick={()=>setTab('orders')}>◫ Pedidos</button>
      <button className={tab==='coupons'?'active':''} onClick={()=>setTab('coupons')}>◇ Cupons</button>
+     <button className={tab==='backup'?'active':''} onClick={()=>setTab('backup')}>⇩ Backup</button>
      <a href="/">← Ver loja</a>
    </aside>
 
@@ -261,7 +305,7 @@ export default function Admin(){
 
 
      {tab==='customers'&&<>
-       <div className="adminToolbar"><input value={customerQuery} onChange={e=>setCustomerQuery(e.target.value)} placeholder="Buscar por nome ou e-mail"/></div>
+       <div className="adminToolbar"><input value={customerQuery} onChange={e=>setCustomerQuery(e.target.value)} placeholder="Buscar por nome ou e-mail"/><button className="exportBtn" onClick={exportCustomers}>Exportar CSV</button></div>
        <div className="customerGrid">{customers.filter(x=>!customerQuery||x.name?.toLowerCase().includes(customerQuery.toLowerCase())||x.email?.toLowerCase().includes(customerQuery.toLowerCase())).map(x=><article className="customerCard" key={x.id}>
          <div className="customerHead">{x.avatar_url?<img src={x.avatar_url} alt=""/>:<span>{(x.name||'C').slice(0,1).toUpperCase()}</span>}<div><b>{x.name}</b><small>{x.email}</small></div></div>
          <div className="customerStats"><div><small>PEDIDOS</small><b>{x.orders||0}</b></div><div><small>PAGOS</small><b>{x.paidOrders||0}</b></div><div><small>TOTAL PAGO</small><b>{money(x.totalPaid||0)}</b></div></div>
@@ -272,7 +316,7 @@ export default function Admin(){
 
      {tab==='activity'&&<>
        <div className="activityNotice"><span>Registra somente eventos de navegação e compra. Não registra senhas, conteúdo digitado em campos sensíveis nem dados completos de pagamento.</span><button onClick={refreshActivity}>Atualizar agora</button></div>
-       <div className="adminToolbar"><input value={activityQuery} onChange={e=>setActivityQuery(e.target.value)} placeholder="Buscar cliente, página, produto ou sessão"/><select value={activityType} onChange={e=>setActivityType(e.target.value)}><option value="all">Todos os eventos</option><option value="page_view">Página acessada</option><option value="category_select">Categoria selecionada</option><option value="product_click">Produto clicado</option><option value="product_view">Produto visualizado</option><option value="add_to_cart">Adicionou ao carrinho</option><option value="cart_open">Abriu carrinho</option><option value="checkout_start">Iniciou checkout</option><option value="checkout_submit">Criou/tentou pedido</option><option value="coupon_attempt">Tentou cupom</option><option value="login_click">Tentou login</option><option value="login_success">Login realizado</option><option value="logout">Logout</option></select></div>
+       <div className="adminToolbar"><input value={activityQuery} onChange={e=>setActivityQuery(e.target.value)} placeholder="Buscar cliente, página, produto ou sessão"/><select value={activityType} onChange={e=>setActivityType(e.target.value)}><option value="all">Todos os eventos</option><option value="page_view">Página acessada</option><option value="category_select">Categoria selecionada</option><option value="product_click">Produto clicado</option><option value="product_view">Produto visualizado</option><option value="add_to_cart">Adicionou ao carrinho</option><option value="cart_open">Abriu carrinho</option><option value="checkout_start">Iniciou checkout</option><option value="checkout_submit">Criou/tentou pedido</option><option value="coupon_attempt">Tentou cupom</option><option value="login_click">Tentou login</option><option value="login_success">Login realizado</option><option value="logout">Logout</option></select><button className="exportBtn" onClick={exportActivity}>Exportar CSV</button></div>
        <div className="activityList">{activity.filter(x=>{
          const q=activityQuery.toLowerCase();
          const hay=[x.page,x.session_id,x.event_type,x.bb_users?.name,x.bb_users?.email,JSON.stringify(x.metadata||{})].filter(Boolean).join(' ').toLowerCase();
@@ -285,12 +329,19 @@ export default function Admin(){
      </>}
 
      {tab==='orders'&&<>
-       <div className="adminToolbar"><input value={orderQuery} onChange={e=>setOrderQuery(e.target.value)} placeholder="Buscar pedido, nome ou e-mail"/><select value={orderStatus} onChange={e=>setOrderStatus(e.target.value)}><option value="all">Todos os status</option><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select></div>
+       <div className="adminToolbar"><input value={orderQuery} onChange={e=>setOrderQuery(e.target.value)} placeholder="Buscar pedido, nome ou e-mail"/><select value={orderStatus} onChange={e=>setOrderStatus(e.target.value)}><option value="all">Todos os status</option><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select><button className="exportBtn" onClick={exportOrders}>Exportar CSV</button></div>
        <div className="adminTable"><h2>Pedidos</h2>{orders.filter(o=>(orderStatus==='all'||o.status===orderStatus)&&(!orderQuery||String(o.id).includes(orderQuery)||o.customer_email?.toLowerCase().includes(orderQuery.toLowerCase())||o.customer_name?.toLowerCase().includes(orderQuery.toLowerCase()))).map(o=><div className="orderAdminCard" key={o.id}>
          <div className="adminOrderRow"><button className="orderToggle" onClick={()=>setExpandedOrder(expandedOrder===o.id?null:o.id)}>#{o.id}</button><span>{o.customer_email}</span><span>{money(o.total)}</span><select value={o.status} onChange={e=>status(o,e.target.value)}><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select><button className="deleteOrderBtn" onClick={()=>deleteOrder(o)} title="Excluir pedido">Excluir</button></div>
          {expandedOrder===o.id&&<div className="orderAdminDetails"><div><small>Cliente</small><b>{o.customer_name}</b><span>{o.customer_email}</span></div><div><small>Data</small><b>{new Date(o.created_at).toLocaleString('pt-BR')}</b><span>{o.payment_method||'pix'}</span></div><div><small>Itens</small>{(typeof o.items==='string'?JSON.parse(o.items):o.items||[]).map((it,i)=><span key={i}>{it.name} × {it.quantity}</span>)}</div><div><small>Histórico</small>{orderEvents.filter(ev=>ev.order_id===o.id).map(ev=><span key={ev.id}>{new Date(ev.created_at).toLocaleString('pt-BR')} — {ev.status}{ev.note?' · '+ev.note:''}</span>)}</div></div>}
        </div>)}{!orders.length&&<p>Nenhum pedido.</p>}</div>
      </>}
+
+     {tab==='backup'&&<div className="backupGrid">
+       <article className="backupCard"><span>BACKUP GERAL</span><h2>Configuração e operação</h2><p>Baixa um arquivo JSON com configurações do site, categorias, produtos, cupons, pedidos, histórico e resumo dos clientes. Senhas e tokens não são incluídos.</p><button onClick={exportBackup}>Baixar backup JSON</button></article>
+       <article className="backupCard"><span>CLIENTES</span><h2>Planilha de clientes</h2><p>Exporta nome, e-mail, tipo de login, pedidos e total pago.</p><button onClick={exportCustomers}>Baixar clientes CSV</button></article>
+       <article className="backupCard"><span>PEDIDOS</span><h2>Planilha de pedidos</h2><p>Exporta os pedidos atuais com valores, status e data.</p><button onClick={exportOrders}>Baixar pedidos CSV</button></article>
+       <article className="backupCard"><span>ATIVIDADE</span><h2>Logs de navegação</h2><p>Exporta os eventos técnicos e de navegação atualmente carregados no painel.</p><button onClick={exportActivity}>Baixar atividade CSV</button></article>
+     </div>}
 
      {tab==='coupons'&&<><form className="couponAdmin" onSubmit={createCoupon}><input name="code" placeholder="Código" required/><select name="type"><option value="percent">Percentual</option><option value="fixed">Valor fixo</option></select><input name="value" type="number" step="0.01" placeholder="Valor" required/><input name="maxUses" type="number" placeholder="Limite de usos"/><button>Criar cupom</button></form><div className="adminTable"><h2>Cupons</h2>{coupons.map(c=><div className="adminCouponRow" key={c.id}><b>{c.code}</b><span>{c.type==='percent'?c.value+'%':money(c.value)}</span><span>{c.used_count||0}/{c.max_uses||'∞'}</span><em>{c.active?'Ativo':'Inativo'}</em></div>)}</div></>}
    </section>
