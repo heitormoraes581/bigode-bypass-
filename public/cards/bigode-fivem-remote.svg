@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#070912"/><stop offset="1" stop-color="#0d1231"/></linearGradient>
+ <linearGradient id="a" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#2116ff"/><stop offset="1" stop-color="#2f7cff"/></linearGradient>
+ <pattern id="g" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M34 0H0V34" fill="none" stroke="#274082" stroke-opacity=".16"/></pattern>
+ <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="760" height="420" rx="20" fill="url(#bg)"/><rect width="760" height="420" rx="20" fill="url(#g)"/>
+<circle cx="610" cy="120" r="140" fill="#2116ff" opacity=".12"/>
+<path d="M0 330C180 290 330 360 760 260" fill="none" stroke="url(#a)" stroke-width="3" opacity=".55"/>
+<text x="42" y="86" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="30" font-weight="900" letter-spacing="2">BIGODE</text>
+<text x="42" y="168" fill="#3340ff" font-family="Arial Black,Arial,sans-serif" font-size="68" font-weight="900" font-style="italic" filter="url(#glow)">REMOTE</text>
+<text x="45" y="214" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="800" letter-spacing="6">FIVEM ACCESS</text>
+<g transform="translate(535 52) rotate(8 80 145)">
+ <rect x="0" y="0" width="148" height="292" rx="22" fill="#05070c" stroke="#3b57ff" stroke-width="3"/>
+ <rect x="12" y="18" width="124" height="250" rx="13" fill="#0b0e19"/>
+ <rect x="30" y="44" width="86" height="9" rx="4" fill="#2e39ff"/>
+ <rect x="30" y="70" width="70" height="7" rx="3" fill="#3c3f52"/>
+ <rect x="30" y="95" width="86" height="28" rx="6" fill="#141b38"/>
+ <rect x="30" y="140" width="86" height="28" rx="6" fill="#141b38"/>
+ <rect x="30" y="185" width="86" height="28" rx="6" fill="#141b38"/>
+ <circle cx="74" cy="278" r="5" fill="#414cff"/>
+</g>
+<text x="42" y="380" fill="#8890b9" font-family="Arial,Helvetica,sans-serif" font-size="14" letter-spacing="3">FIVEM • BIGODE BYPASS</text>
+</svg>
