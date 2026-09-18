@@ -1,0 +1,10 @@
+[
+  {"id":1,"slug":"bigode-basic","name":"Bigode Basic","description":"Plano de entrada da linha Bigode, com acesso digital e suporte.","old":70,"price":50,"tag":"BASIC","tone":"green","stock":100,"active":true},
+  {"id":2,"slug":"bigode-advanced","name":"Bigode Advanced","description":"Pacote intermediário da linha Bigode com recursos adicionais.","old":200,"price":150,"tag":"ADVANCED","tone":"purple","stock":100,"active":true},
+  {"id":3,"slug":"bigode-premium","name":"Bigode Premium","description":"Pacote premium da linha Bigode para uma experiência mais completa.","old":300,"price":250,"tag":"PREMIUM","tone":"pink","stock":100,"active":true},
+  {"id":4,"slug":"bigode-ultimate","name":"Bigode Ultimate","description":"Pacote completo da linha Bigode com prioridade de suporte.","old":450,"price":400,"tag":"ULTIMATE","tone":"cyan","stock":100,"active":true},
+  {"id":5,"slug":"bigode-remote","name":"Bigode Remote","description":"Serviço digital remoto da linha Bigode.","old":700,"price":500,"tag":"REMOTE","tone":"blue","stock":50,"active":true},
+  {"id":6,"slug":"bigode-exclusive","name":"Bigode Exclusive","description":"Edição exclusiva com disponibilidade limitada.","old":750,"price":600,"tag":"EXCLUSIVE","tone":"orange","stock":30,"active":true},
+  {"id":7,"slug":"bigode-pro","name":"Bigode Pro","description":"Plano profissional da linha Bigode.","old":950,"price":750,"tag":"PRO","tone":"violet","stock":30,"active":true},
+  {"id":8,"slug":"bigode-1-1","name":"Bigode 1:1","description":"Atendimento individual e personalizado para produtos digitais legítimos.","old":1500,"price":1300,"tag":"1:1","tone":"blue","stock":10,"active":true}
+]
