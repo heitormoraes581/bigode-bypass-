@@ -2438,3 +2438,21 @@ main[style] .product,main[style] .category,main[style] .why,main[style] footer{-
   width:15px!important;
   height:15px!important;
 }
+
+
+/* ===== Social icon sizing + CMS social links ===== */
+.social a[aria-label="Discord"] svg{
+  width:17px!important;
+  height:17px!important;
+}
+.social a[aria-label="YouTube"] svg,
+.social a[aria-label="TikTok"] svg{
+  width:15px!important;
+  height:15px!important;
+}
+.cmsHelp{
+  margin:0 0 10px;
+  color:#777a84;
+  font-size:10px;
+  line-height:1.55;
+}
