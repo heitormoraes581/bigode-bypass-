@@ -2418,3 +2418,23 @@ main[style] .product,main[style] .category,main[style] .why,main[style] footer{-
   .social{justify-content:flex-start;margin-top:18px}
   .links{text-align:left}
 }
+
+
+/* ===== Footer social size match ===== */
+.social{
+  gap:8px;
+}
+.social a{
+  width:34px!important;
+  height:34px!important;
+  min-width:34px;
+  min-height:34px;
+  border-radius:50%;
+  background:#08090c;
+  border:1px solid #17191f;
+  box-shadow:0 2px 8px rgba(0,0,0,.24);
+}
+.social svg{
+  width:15px!important;
+  height:15px!important;
+}
