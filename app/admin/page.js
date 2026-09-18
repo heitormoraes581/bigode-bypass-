@@ -1,21 +1,230 @@
 'use client';
 import{useEffect,useState}from'react';
 import{api,setToken}from'../../lib/api-client';
+
 const money=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',');
+const emptySettings={
+ siteName:'Bigode Bypass',storeLabel:'LOJA DIGITAL',logoUrl:'/logo-bigode-bypass.png',
+ supportText:'Alguma dúvida?',supportCta:'Abra um ticket em nosso servidor',supportUrl:'#',
+ bannerUrl:'/banner-bigode-bypass.png',heroTitle:'Sua experiência em',heroHighlight:'produtos digitais.',
+ heroText:'Uma loja moderna, rápida e organizada, com atendimento eficiente e uma experiência de compra feita para PC.',
+ heroButton:'Ver produtos',popularTitle:'Categorias populares',
+ footerText:'Produtos digitais com uma experiência rápida e suporte eficiente.',
+ copyright:'Copyright © 2026 - Bigode Bypass.',termsLabel:'Termos e condições',termsUrl:'#',
+ privacyLabel:'Privacidade',privacyUrl:'#',discordUrl:'#',youtubeUrl:'#',tiktokUrl:'#',
+ primaryColor:'#2116ff',backgroundColor:'#07080b',panelColor:'#0d0e12',
+ seoTitle:'Bigode Bypass',seoDescription:'Loja digital Bigode Bypass',
+ why1Title:'⚡ Entrega digital',why1Text:'Processo rápido e organizado.',
+ why2Title:'🔒 Compra segura',why2Text:'Checkout preparado para pagamento protegido.',
+ why3Title:'🎧 Suporte',why3Text:'Atendimento para suas compras.'
+};
+
 export default function Admin(){
- const[user,setUser]=useState(undefined),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[tab,setTab]=useState('overview'),[metrics,setMetrics]=useState({}),[products,setProducts]=useState([]),[orders,setOrders]=useState([]),[coupons,setCoupons]=useState([]),[msg,setMsg]=useState('');
- const load=async()=>{const me=await api('/auth/me');setUser(me.user);if(me.user.role!=='admin')return;const[d,p,o,c]=await Promise.all([api('/admin/dashboard'),api('/admin/products'),api('/admin/orders'),api('/admin/coupons')]);setMetrics(d);setProducts(p.products||[]);setOrders(o.orders||[]);setCoupons(c.coupons||[])};
+ const[user,setUser]=useState(undefined),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[tab,setTab]=useState('overview');
+ const[metrics,setMetrics]=useState({}),[products,setProducts]=useState([]),[orders,setOrders]=useState([]),[coupons,setCoupons]=useState([]),[categories,setCategories]=useState([]),[settings,setSettings]=useState(emptySettings);
+ const[msg,setMsg]=useState(''),[saving,setSaving]=useState(false);
+
+ const load=async()=>{
+   const me=await api('/auth/me');setUser(me.user);
+   if(me.user.role!=='admin')return;
+   const[d,p,o,c,s,cat]=await Promise.all([
+     api('/admin/dashboard'),api('/admin/products'),api('/admin/orders'),api('/admin/coupons'),
+     api('/admin/site'),api('/admin/categories')
+   ]);
+   setMetrics(d);setProducts(p.products||[]);setOrders(o.orders||[]);setCoupons(c.coupons||[]);
+   setSettings({...emptySettings,...(s.settings||{})});setCategories(cat.categories||[]);
+ };
  useEffect(()=>{load().catch(()=>setUser(null))},[]);
+
  const login=async e=>{e.preventDefault();try{const d=await api('/auth/login',{method:'POST',body:JSON.stringify({email,password})});setToken(d.token);await load()}catch(e){setMsg(e.message)}};
- const patchProduct=async(p,changes)=>{try{const d=await api('/admin/products/'+p.id,{method:'PATCH',body:JSON.stringify(changes)});setProducts(xs=>xs.map(x=>x.id===p.id?d.product:x));setMsg('Produto atualizado.')}catch(e){setMsg(e.message)}};
- const createCoupon=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{const d=await api('/admin/coupons',{method:'POST',body:JSON.stringify({code:f.get('code'),type:f.get('type'),value:Number(f.get('value')),maxUses:Number(f.get('maxUses'))||null})});setCoupons(x=>[d.coupon,...x]);e.currentTarget.reset();setMsg('Cupom criado.')}catch(e){setMsg(e.message)}};
- const status=async(o,s)=>{const d=await api('/admin/orders/'+o.id,{method:'PATCH',body:JSON.stringify({status:s})});setOrders(xs=>xs.map(x=>x.id===o.id?d.order:x));};
+ const flash=t=>{setMsg(t);setTimeout(()=>setMsg(''),2500)};
+
+ const saveSite=async()=>{
+   setSaving(true);
+   try{const d=await api('/admin/site',{method:'PATCH',body:JSON.stringify({settings})});setSettings({...emptySettings,...d.settings});flash('Site atualizado.');}
+   catch(e){flash(e.message)}finally{setSaving(false)}
+ };
+ const setS=(k,v)=>setSettings(x=>({...x,[k]:v}));
+
+ const patchProduct=async(p,changes)=>{
+   try{const d=await api('/admin/products/'+p.id,{method:'PATCH',body:JSON.stringify(changes)});setProducts(xs=>xs.map(x=>x.id===p.id?d.product:x));flash('Produto atualizado.')}
+   catch(e){flash(e.message)}
+ };
+ const createProduct=async e=>{
+   e.preventDefault();const f=new FormData(e.currentTarget);
+   try{
+     const d=await api('/admin/products',{method:'POST',body:JSON.stringify({
+       name:f.get('name'),slug:f.get('slug'),description:f.get('description'),
+       old:Number(f.get('old')||0),price:Number(f.get('price')||0),stock:Number(f.get('stock')||0),
+       tag:f.get('tag'),tone:f.get('tone')||'blue',imageUrl:f.get('imageUrl')||'',
+       categorySlug:f.get('categorySlug')||'fivem',sortOrder:Number(f.get('sortOrder')||0),active:true
+     })});
+     setProducts(x=>[...x,d.product].sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0)));e.currentTarget.reset();flash('Produto criado.');
+   }catch(e){flash(e.message)}
+ };
+
+ const createCategory=async e=>{
+   e.preventDefault();const f=new FormData(e.currentTarget);
+   try{
+     const d=await api('/admin/categories',{method:'POST',body:JSON.stringify({name:f.get('name'),slug:f.get('slug'),imageUrl:f.get('imageUrl'),sortOrder:Number(f.get('sortOrder')||0),active:true})});
+     setCategories(x=>[...x,d.category].sort((a,b)=>a.sort_order-b.sort_order));e.currentTarget.reset();flash('Categoria criada.');
+   }catch(e){flash(e.message)}
+ };
+ const patchCategory=async(c,changes)=>{
+   try{const d=await api('/admin/categories/'+c.id,{method:'PATCH',body:JSON.stringify(changes)});setCategories(xs=>xs.map(x=>x.id===c.id?d.category:x));flash('Categoria atualizada.')}
+   catch(e){flash(e.message)}
+ };
+
+ const createCoupon=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{const d=await api('/admin/coupons',{method:'POST',body:JSON.stringify({code:f.get('code'),type:f.get('type'),value:Number(f.get('value')),maxUses:Number(f.get('maxUses'))||null})});setCoupons(x=>[d.coupon,...x]);e.currentTarget.reset();flash('Cupom criado.')}catch(e){flash(e.message)}};
+ const status=async(o,s)=>{try{const d=await api('/admin/orders/'+o.id,{method:'PATCH',body:JSON.stringify({status:s})});setOrders(xs=>xs.map(x=>x.id===o.id?d.order:x));flash('Pedido atualizado.')}catch(e){flash(e.message)}};
+
  if(user===undefined)return <main className="adminLogin"><p>Carregando...</p></main>;
  if(!user||user.role!=='admin')return <main className="adminLogin"><form onSubmit={login}><img src="/logo-bigode-bypass.png"/><h1>Administração</h1><input type="email" placeholder="E-mail" value={email} onChange={e=>setEmail(e.target.value)} required/><input type="password" placeholder="Senha" value={password} onChange={e=>setPassword(e.target.value)} required/>{msg&&<p>{msg}</p>}<button>Entrar</button><a href="/">← Voltar para a loja</a></form></main>;
- return <main className="adminPage"><aside><div className="adminBrand"><img src="/logo-bigode-bypass.png"/><div><h2>BIGODE</h2><small>BYPASS</small></div></div><small>ADMINISTRAÇÃO</small><button className={tab==='overview'?'active':''} onClick={()=>setTab('overview')}>▦ Visão geral</button><button className={tab==='products'?'active':''} onClick={()=>setTab('products')}>▣ Produtos</button><button className={tab==='orders'?'active':''} onClick={()=>setTab('orders')}>◫ Pedidos</button><button className={tab==='coupons'?'active':''} onClick={()=>setTab('coupons')}>◇ Cupons</button><a href="/">← Ver loja</a></aside><section><span>PAINEL ADMINISTRATIVO</span><h1>{tab==='overview'?'Visão geral':tab==='products'?'Produtos':tab==='orders'?'Pedidos':'Cupons'}</h1>{msg&&<p className="formMessage">{msg}</p>}
- {tab==='overview'&&<><div className="metrics"><div><small>Produtos</small><b>{metrics.products||0}</b></div><div><small>Pedidos</small><b>{metrics.orders||0}</b></div><div><small>Receita paga</small><b>{money(metrics.revenue)}</b></div><div><small>Pendentes</small><b>{metrics.pending||0}</b></div></div></>}
- {tab==='products'&&<div className="adminTable productsAdmin"><h2>Gerenciar produtos</h2>{products.map(p=><div className="adminProductRow" key={p.id}><b>{p.name}</b><label>Preço<input type="number" defaultValue={p.price} onBlur={e=>patchProduct(p,{price:Number(e.target.value)})}/></label><label>Estoque<input type="number" defaultValue={p.stock} onBlur={e=>patchProduct(p,{stock:Number(e.target.value)})}/></label><label className="switchLabel"><input type="checkbox" defaultChecked={p.active} onChange={e=>patchProduct(p,{active:e.target.checked})}/> Ativo</label><a href={'/produto?slug='+p.slug}>Ver</a></div>)}</div>}
- {tab==='orders'&&<div className="adminTable"><h2>Pedidos</h2>{orders.map(o=><div className="adminOrderRow" key={o.id}><b>#{o.id}</b><span>{o.customer_email}</span><span>{money(o.total)}</span><select value={o.status} onChange={e=>status(o,e.target.value)}><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select></div>)}{!orders.length&&<p>Nenhum pedido.</p>}</div>}
- {tab==='coupons'&&<><form className="couponAdmin" onSubmit={createCoupon}><input name="code" placeholder="Código" required/><select name="type"><option value="percent">Percentual</option><option value="fixed">Valor fixo</option></select><input name="value" type="number" step="0.01" placeholder="Valor" required/><input name="maxUses" type="number" placeholder="Limite de usos"/><button>Criar cupom</button></form><div className="adminTable"><h2>Cupons</h2>{coupons.map(c=><div className="adminCouponRow" key={c.id}><b>{c.code}</b><span>{c.type==='percent'?c.value+'%':money(c.value)}</span><span>{c.used_count||0}/{c.max_uses||'∞'}</span><em>{c.active?'Ativo':'Inativo'}</em></div>)}</div></>}
- </section></main>
+
+ const title={overview:'Visão geral',site:'Editar site',appearance:'Aparência',categories:'Categorias',products:'Produtos',orders:'Pedidos',coupons:'Cupons'}[tab]||'Administração';
+
+ return <main className="adminPage">
+   <aside>
+     <div className="adminBrand"><img src={settings.logoUrl||'/logo-bigode-bypass.png'}/><div><h2>{settings.siteName||'BIGODE'}</h2><small>ADMIN</small></div></div>
+     <small>CMS DA LOJA</small>
+     <button className={tab==='overview'?'active':''} onClick={()=>setTab('overview')}>▦ Visão geral</button>
+     <button className={tab==='site'?'active':''} onClick={()=>setTab('site')}>✎ Editar site</button>
+     <button className={tab==='appearance'?'active':''} onClick={()=>setTab('appearance')}>◐ Aparência</button>
+     <button className={tab==='categories'?'active':''} onClick={()=>setTab('categories')}>▤ Categorias</button>
+     <button className={tab==='products'?'active':''} onClick={()=>setTab('products')}>▣ Produtos</button>
+     <button className={tab==='orders'?'active':''} onClick={()=>setTab('orders')}>◫ Pedidos</button>
+     <button className={tab==='coupons'?'active':''} onClick={()=>setTab('coupons')}>◇ Cupons</button>
+     <a href="/">← Ver loja</a>
+   </aside>
+
+   <section>
+     <div className="adminTopline"><div><span>PAINEL ADMINISTRATIVO</span><h1>{title}</h1></div>{['site','appearance'].includes(tab)&&<button className="publishBtn" onClick={saveSite} disabled={saving}>{saving?'Salvando...':'Salvar / Publicar'}</button>}</div>
+     {msg&&<p className="formMessage">{msg}</p>}
+
+     {tab==='overview'&&<>
+       <div className="metrics">
+         <div><small>Produtos</small><b>{metrics.products||0}</b></div>
+         <div><small>Pedidos</small><b>{metrics.orders||0}</b></div>
+         <div><small>Receita paga</small><b>{money(metrics.revenue)}</b></div>
+         <div><small>Pendentes</small><b>{metrics.pending||0}</b></div>
+       </div>
+       <div className="adminTable cmsIntro"><h2>Editor do site</h2><p>Use <b>Editar site</b> para textos, banners, links, rodapé e SEO. Em <b>Aparência</b>, altere as cores principais. Categorias e produtos são atualizados diretamente no catálogo.</p></div>
+     </>}
+
+     {tab==='site'&&<div className="cmsGrid">
+       <CmsSection title="Marca e cabeçalho">
+         <Field label="Nome da loja" value={settings.siteName} onChange={v=>setS('siteName',v)}/>
+         <Field label="Texto abaixo do nome" value={settings.storeLabel} onChange={v=>setS('storeLabel',v)}/>
+         <Field label="URL da logo" value={settings.logoUrl} onChange={v=>setS('logoUrl',v)}/>
+       </CmsSection>
+       <CmsSection title="Barra de aviso">
+         <Field label="Texto" value={settings.supportText} onChange={v=>setS('supportText',v)}/>
+         <Field label="Botão / chamada" value={settings.supportCta} onChange={v=>setS('supportCta',v)}/>
+         <Field label="Link" value={settings.supportUrl} onChange={v=>setS('supportUrl',v)}/>
+       </CmsSection>
+       <CmsSection title="Banner e destaque">
+         <Field label="URL do banner" value={settings.bannerUrl} onChange={v=>setS('bannerUrl',v)}/>
+         <Field label="Título" value={settings.heroTitle} onChange={v=>setS('heroTitle',v)}/>
+         <Field label="Texto em destaque" value={settings.heroHighlight} onChange={v=>setS('heroHighlight',v)}/>
+         <Area label="Descrição" value={settings.heroText} onChange={v=>setS('heroText',v)}/>
+         <Field label="Texto do botão" value={settings.heroButton} onChange={v=>setS('heroButton',v)}/>
+         <Field label="Título de categorias" value={settings.popularTitle} onChange={v=>setS('popularTitle',v)}/>
+       </CmsSection>
+       <CmsSection title="Blocos de confiança">
+         <Field label="Bloco 1 - título" value={settings.why1Title} onChange={v=>setS('why1Title',v)}/>
+         <Field label="Bloco 1 - texto" value={settings.why1Text} onChange={v=>setS('why1Text',v)}/>
+         <Field label="Bloco 2 - título" value={settings.why2Title} onChange={v=>setS('why2Title',v)}/>
+         <Field label="Bloco 2 - texto" value={settings.why2Text} onChange={v=>setS('why2Text',v)}/>
+         <Field label="Bloco 3 - título" value={settings.why3Title} onChange={v=>setS('why3Title',v)}/>
+         <Field label="Bloco 3 - texto" value={settings.why3Text} onChange={v=>setS('why3Text',v)}/>
+       </CmsSection>
+       <CmsSection title="Rodapé e redes">
+         <Area label="Texto do rodapé" value={settings.footerText} onChange={v=>setS('footerText',v)}/>
+         <Field label="Copyright" value={settings.copyright} onChange={v=>setS('copyright',v)}/>
+         <Field label="Discord" value={settings.discordUrl} onChange={v=>setS('discordUrl',v)}/>
+         <Field label="YouTube" value={settings.youtubeUrl} onChange={v=>setS('youtubeUrl',v)}/>
+         <Field label="TikTok" value={settings.tiktokUrl} onChange={v=>setS('tiktokUrl',v)}/>
+         <Field label="Texto dos termos" value={settings.termsLabel} onChange={v=>setS('termsLabel',v)}/>
+         <Field label="Link dos termos" value={settings.termsUrl} onChange={v=>setS('termsUrl',v)}/>
+         <Field label="Texto da privacidade" value={settings.privacyLabel} onChange={v=>setS('privacyLabel',v)}/>
+         <Field label="Link da privacidade" value={settings.privacyUrl} onChange={v=>setS('privacyUrl',v)}/>
+       </CmsSection>
+       <CmsSection title="SEO">
+         <Field label="Título do site" value={settings.seoTitle} onChange={v=>setS('seoTitle',v)}/>
+         <Area label="Descrição do site" value={settings.seoDescription} onChange={v=>setS('seoDescription',v)}/>
+       </CmsSection>
+     </div>}
+
+     {tab==='appearance'&&<div className="cmsGrid appearanceGrid">
+       <CmsSection title="Cores principais">
+         <ColorField label="Cor principal" value={settings.primaryColor} onChange={v=>setS('primaryColor',v)}/>
+         <ColorField label="Fundo" value={settings.backgroundColor} onChange={v=>setS('backgroundColor',v)}/>
+         <ColorField label="Painéis" value={settings.panelColor} onChange={v=>setS('panelColor',v)}/>
+       </CmsSection>
+       <div className="themePreview" style={{'--preview-primary':settings.primaryColor,'--preview-bg':settings.backgroundColor,'--preview-panel':settings.panelColor}}>
+         <small>PRÉVIA</small><div className="previewCard"><b>{settings.siteName}</b><span>Produto de exemplo</span><button>Comprar agora</button></div>
+       </div>
+     </div>}
+
+     {tab==='categories'&&<>
+       <form className="cmsCreateRow" onSubmit={createCategory}>
+         <input name="name" placeholder="Nome da categoria" required/>
+         <input name="slug" placeholder="slug-opcional"/>
+         <input name="imageUrl" placeholder="URL da imagem (opcional)"/>
+         <input name="sortOrder" type="number" placeholder="Ordem"/>
+         <button>Criar categoria</button>
+       </form>
+       <div className="adminTable"><h2>Categorias</h2>{categories.map(c=><div className="categoryAdminRow" key={c.id}>
+         <label>Nome<input defaultValue={c.name} onBlur={e=>patchCategory(c,{name:e.target.value})}/></label>
+         <label>Slug<input defaultValue={c.slug} onBlur={e=>patchCategory(c,{slug:e.target.value})}/></label>
+         <label>Imagem<input defaultValue={c.image_url||''} onBlur={e=>patchCategory(c,{imageUrl:e.target.value})}/></label>
+         <label>Ordem<input type="number" defaultValue={c.sort_order||0} onBlur={e=>patchCategory(c,{sortOrder:Number(e.target.value)})}/></label>
+         <label className="switchLabel"><input type="checkbox" defaultChecked={c.active} onChange={e=>patchCategory(c,{active:e.target.checked})}/> Ativa</label>
+       </div>)}</div>
+     </>}
+
+     {tab==='products'&&<>
+       <form className="productCreateForm" onSubmit={createProduct}>
+         <h2>Novo produto</h2>
+         <div className="productCreateGrid">
+           <input name="name" placeholder="Nome" required/>
+           <input name="slug" placeholder="Slug (opcional)"/>
+           <input name="tag" placeholder="Tag"/>
+           <select name="categorySlug">{categories.map(c=><option key={c.id} value={c.slug}>{c.name}</option>)}</select>
+           <input name="old" type="number" step="0.01" placeholder="Preço antigo"/>
+           <input name="price" type="number" step="0.01" placeholder="Preço" required/>
+           <input name="stock" type="number" placeholder="Estoque" required/>
+           <input name="sortOrder" type="number" placeholder="Ordem"/>
+           <input name="tone" placeholder="Cor/tag CSS (blue, green...)"/>
+           <input name="imageUrl" placeholder="URL da imagem"/>
+           <textarea name="description" placeholder="Descrição"></textarea>
+         </div><button className="publishBtn">Criar produto</button>
+       </form>
+       <div className="adminTable productsAdmin"><h2>Gerenciar produtos</h2>{products.map(p=><div className="productEditor" key={p.id}>
+         <div className="productEditorHead"><div><b>{p.name}</b><small>{p.slug}</small></div><a href={'/produto?slug='+p.slug}>Abrir produto ↗</a></div>
+         <div className="productEditorGrid">
+           <label>Nome<input defaultValue={p.name} onBlur={e=>patchProduct(p,{name:e.target.value})}/></label>
+           <label>Preço antigo<input type="number" step="0.01" defaultValue={p.old} onBlur={e=>patchProduct(p,{old:Number(e.target.value)})}/></label>
+           <label>Preço<input type="number" step="0.01" defaultValue={p.price} onBlur={e=>patchProduct(p,{price:Number(e.target.value)})}/></label>
+           <label>Estoque<input type="number" defaultValue={p.stock} onBlur={e=>patchProduct(p,{stock:Number(e.target.value)})}/></label>
+           <label>Tag<input defaultValue={p.tag||''} onBlur={e=>patchProduct(p,{tag:e.target.value})}/></label>
+           <label>Categoria<select defaultValue={p.categorySlug||'fivem'} onChange={e=>patchProduct(p,{categorySlug:e.target.value})}>{categories.map(c=><option key={c.id} value={c.slug}>{c.name}</option>)}</select></label>
+           <label>Ordem<input type="number" defaultValue={p.sortOrder||0} onBlur={e=>patchProduct(p,{sortOrder:Number(e.target.value)})}/></label>
+           <label>Imagem<input defaultValue={p.imageUrl||''} onBlur={e=>patchProduct(p,{imageUrl:e.target.value})}/></label>
+           <label className="wide">Descrição<textarea defaultValue={p.description||''} onBlur={e=>patchProduct(p,{description:e.target.value})}></textarea></label>
+           <label className="switchLabel"><input type="checkbox" defaultChecked={p.active} onChange={e=>patchProduct(p,{active:e.target.checked})}/> Produto ativo</label>
+         </div>
+       </div>)}</div>
+     </>}
+
+     {tab==='orders'&&<div className="adminTable"><h2>Pedidos</h2>{orders.map(o=><div className="adminOrderRow" key={o.id}><b>#{o.id}</b><span>{o.customer_email}</span><span>{money(o.total)}</span><select value={o.status} onChange={e=>status(o,e.target.value)}><option value="pending">Pendente</option><option value="paid">Pago</option><option value="cancelled">Cancelado</option><option value="delivered">Entregue</option></select></div>)}{!orders.length&&<p>Nenhum pedido.</p>}</div>}
+
+     {tab==='coupons'&&<><form className="couponAdmin" onSubmit={createCoupon}><input name="code" placeholder="Código" required/><select name="type"><option value="percent">Percentual</option><option value="fixed">Valor fixo</option></select><input name="value" type="number" step="0.01" placeholder="Valor" required/><input name="maxUses" type="number" placeholder="Limite de usos"/><button>Criar cupom</button></form><div className="adminTable"><h2>Cupons</h2>{coupons.map(c=><div className="adminCouponRow" key={c.id}><b>{c.code}</b><span>{c.type==='percent'?c.value+'%':money(c.value)}</span><span>{c.used_count||0}/{c.max_uses||'∞'}</span><em>{c.active?'Ativo':'Inativo'}</em></div>)}</div></>}
+   </section>
+ </main>
 }
+
+function CmsSection({title,children}){return <div className="cmsSection"><h2>{title}</h2>{children}</div>}
+function Field({label,value,onChange}){return <label className="cmsField">{label}<input value={value||''} onChange={e=>onChange(e.target.value)}/></label>}
+function Area({label,value,onChange}){return <label className="cmsField">{label}<textarea value={value||''} onChange={e=>onChange(e.target.value)}/></label>}
+function ColorField({label,value,onChange}){return <label className="cmsField colorField">{label}<div><input type="color" value={value||'#000000'} onChange={e=>onChange(e.target.value)}/><input value={value||''} onChange={e=>onChange(e.target.value)}/></div></label>}
