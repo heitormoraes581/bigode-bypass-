@@ -29,4 +29,5 @@ app.get('/admin/coupons',requireAdmin,safe(async(req,res)=>res.json({coupons:awa
 app.post('/admin/coupons',requireAdmin,safe(async(req,res)=>res.json({coupon:await store.createCoupon(req.body)})));
 app.patch('/admin/coupons/:id',requireAdmin,safe(async(req,res)=>res.json({coupon:await store.updateCoupon(req.params.id,req.body)})));
 app.use((req,res)=>res.status(404).json({error:'Rota não encontrada'}));
+store.listProducts(false).catch(e=>console.error('Bootstrap error',e));
 app.listen(PORT,()=>console.log('Bigode Bypass API online na porta '+PORT));
